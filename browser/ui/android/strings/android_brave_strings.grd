@@ -927,6 +927,15 @@ until they verify, or until 90 days have passed.
       <message name="IDS_PREFS_USE_CUSTOM_TABS" desc="Title for closing all tabs closes brave in controls section">
         Open tabs in Custom Tabs
       </message>
+      <message name="IDS_BRAVE_UI_WALLET_BUTTON_DISCONNECTED" desc="">
+        Disconnected
+      </message>
+      <message name="IDS_BRAVE_UI_WALLET_BUTTON_UNVERIFIED" desc="">
+        Verify Wallet
+      </message>
+      <message name="IDS_BRAVE_UI_WALLET_BUTTON_VERIFIED" desc="">
+        Wallet Verified
+      </message>
     </messages>
   </release>
 </grit>
