@@ -14,6 +14,7 @@
 #include "bat/confirmations/internal/unblinded_tokens.h"
 #include "bat/confirmations/internal/create_confirmation_request.h"
 #include "bat/confirmations/internal/fetch_payment_token_request.h"
+#include "bat/confirmations/internal/platform_info.h"
 #include "bat/confirmations/internal/time.h"
 #include "bat/confirmations/internal/token_info.h"
 #include "bat/confirmations/internal/confirmation_info.h"
@@ -107,7 +108,7 @@ void RedeemToken::CreateConfirmation(
   BLOG(INFO) << "CreateConfirmation";
 
   BLOG(INFO) << "POST /v1/confirmation/{confirmation_id}/{credential}";
-  CreateConfirmationRequest request;
+  CreateConfirmationRequest request(confirmations_);
 
   BLOG(INFO) << "URL Request:";
 
@@ -116,8 +117,12 @@ void RedeemToken::CreateConfirmation(
 
   auto method = request.GetMethod();
 
-  auto confirmation_request_dto =
-      request.CreateConfirmationRequestDTO(confirmation);
+  const auto client_info = confirmations_->get_client()->GetClientInfo();
+  const std::string build_channel = client_info->channel;
+  const std::string platform = GetPlatformName();
+
+  auto confirmation_request_dto = request.CreateConfirmationRequestDTO(
+      confirmation, build_channel, platform);
 
   auto body = request.BuildBody(confirmation_request_dto);
   BLOG(INFO) << "  Body: " << body;
@@ -150,6 +155,7 @@ void RedeemToken::CreateConfirmation(
   confirmation_info.creative_instance_id = ad_info.creative_instance_id;
   confirmation_info.type = confirmation_type;
   confirmation_info.token_info = token_info;
+  confirmation_info.country_code = ad_info.geo_target;
 
   auto payment_tokens = helper::Security::GenerateTokens(1);
   confirmation_info.payment_token = payment_tokens.front();
@@ -158,8 +164,13 @@ void RedeemToken::CreateConfirmation(
   auto blinded_payment_token = blinded_payment_tokens.front();
   confirmation_info.blinded_payment_token = blinded_payment_token;
 
-  CreateConfirmationRequest request;
-  auto payload = request.CreateConfirmationRequestDTO(confirmation_info);
+  const auto client_info = confirmations_->get_client()->GetClientInfo();
+  const std::string build_channel = client_info->channel;
+  const std::string platform = GetPlatformName();
+
+  CreateConfirmationRequest request(confirmations_);
+  auto payload = request.CreateConfirmationRequestDTO(confirmation_info,
+      build_channel, platform);
   confirmation_info.credential = request.CreateCredential(token_info, payload);
   confirmation_info.timestamp_in_seconds = Time::NowInSeconds();
 
@@ -466,8 +477,13 @@ bool RedeemToken::Verify(
   auto signature = signature_value->GetString();
   auto verification_signature = VerificationSignature::decode_base64(signature);
 
-  CreateConfirmationRequest request;
-  auto payload = request.CreateConfirmationRequestDTO(info);
+  const auto client_info = confirmations_->get_client()->GetClientInfo();
+  const std::string build_channel = client_info->channel;
+  const std::string platform = GetPlatformName();
+
+  CreateConfirmationRequest request(confirmations_);
+  auto payload =
+      request.CreateConfirmationRequestDTO(info, build_channel, platform);
 
   auto unblinded_token = info.token_info.unblinded_token;
   auto verification_key = unblinded_token.derive_verification_key();

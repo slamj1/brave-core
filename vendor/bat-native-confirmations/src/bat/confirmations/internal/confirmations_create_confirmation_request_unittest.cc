@@ -12,6 +12,8 @@
 #include "bat/confirmations/internal/confirmations_impl.h"
 #include "bat/confirmations/internal/create_confirmation_request.h"
 #include "bat/confirmations/internal/security_helper.h"
+#include "bat/confirmations/internal/platform_info.h"
+#include "base/strings/stringprintf.h"
 
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -32,7 +34,8 @@ class ConfirmationsCreateConfirmationRequestTest : public ::testing::Test {
       mock_confirmations_client_(std::make_unique<MockConfirmationsClient>()),
       confirmations_(std::make_unique<ConfirmationsImpl>(
           mock_confirmations_client_.get())),
-      request_(std::make_unique<CreateConfirmationRequest>()) {
+      request_(std::make_unique<CreateConfirmationRequest>(
+          confirmations_.get())) {
     // You can do set-up work for each test here
   }
 
@@ -96,15 +99,19 @@ TEST_F(ConfirmationsCreateConfirmationRequestTest, BuildBody_Viewed) {
 
   ConfirmationInfo info;
   info.creative_instance_id = creative_instance_id;
-  info.blinded_payment_token = blinded_token;
   info.type = ConfirmationType::kViewed;
-  auto payload = request_->CreateConfirmationRequestDTO(info);
+  info.blinded_payment_token = blinded_token;
+  info.country_code = "US";
+
+  const std::string platform = GetPlatformName();
+  auto payload =
+      request_->CreateConfirmationRequestDTO(info, "release", platform);
 
   // Act
   auto body = request_->BuildBody(payload);
 
   // Assert
-  std::string expected_body = R"({"blindedPaymentToken":"PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=","creativeInstanceId":"546fe7b0-5047-4f28-a11c-81f14edcf0f6","payload":{},"type":"view"})";  // NOLINT
+  std::string expected_body = base::StringPrintf("{\"blindedPaymentToken\":\"PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=\",\"channelName\":\"release\",\"countryCode\":\"US\",\"creativeInstanceId\":\"546fe7b0-5047-4f28-a11c-81f14edcf0f6\",\"payload\":{},\"platform\":\"%s\",\"type\":\"view\"}", platform.c_str());  // NOLINT
   EXPECT_EQ(expected_body, body);
 }
 
@@ -152,12 +159,16 @@ TEST_F(
   // Act
   ConfirmationInfo info;
   info.creative_instance_id = creative_instance_id;
-  info.blinded_payment_token = blinded_token;
   info.type = ConfirmationType::kViewed;
-  auto payload = request_->CreateConfirmationRequestDTO(info);
+  info.blinded_payment_token = blinded_token;
+  info.country_code = "US";
+
+  const std::string platform = GetPlatformName();
+  auto payload =
+      request_->CreateConfirmationRequestDTO(info, "release", platform);
 
   // Assert
-  std::string expected_payload = R"({"blindedPaymentToken":"PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=","creativeInstanceId":"546fe7b0-5047-4f28-a11c-81f14edcf0f6","payload":{},"type":"view"})";  // NOLINT
+  std::string expected_payload = base::StringPrintf("{\"blindedPaymentToken\":\"PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=\",\"channelName\":\"release\",\"countryCode\":\"US\",\"creativeInstanceId\":\"546fe7b0-5047-4f28-a11c-81f14edcf0f6\",\"payload\":{},\"platform\":\"%s\",\"type\":\"view\"}", platform.c_str());  // NOLINT
   EXPECT_EQ(expected_payload, payload);
 }
 
@@ -178,16 +189,145 @@ TEST_F(ConfirmationsCreateConfirmationRequestTest, CreateCredential_Viewed) {
 
   ConfirmationInfo info;
   info.creative_instance_id = creative_instance_id;
-  info.blinded_payment_token = blinded_token;
   info.type = ConfirmationType::kViewed;
-  auto payload = request_->CreateConfirmationRequestDTO(info);
+  info.blinded_payment_token = blinded_token;
+  info.country_code = "US";
+
+  auto payload =
+      request_->CreateConfirmationRequestDTO(info, "release", "platform");
 
   // Act
   auto credential = request_->CreateCredential(token_info, payload);
 
   // Assert
-  std::string expected_credential = "eyJwYXlsb2FkIjoie1wiYmxpbmRlZFBheW1lbnRUb2tlblwiOlwiUEkzbEZxcEdWRkt6NFRINXlFd1hJM1IvUW50bVRwVWdlQmFLK1NUaUJ4OD1cIixcImNyZWF0aXZlSW5zdGFuY2VJZFwiOlwiNTQ2ZmU3YjAtNTA0Ny00ZjI4LWExMWMtODFmMTRlZGNmMGY2XCIsXCJwYXlsb2FkXCI6e30sXCJ0eXBlXCI6XCJ2aWV3XCJ9Iiwic2lnbmF0dXJlIjoibGRWYWxyb2hqNWFIWW1FdWMvUmpIYTAweFdMdFJWY0hGMS9XWnl4ZGJYMnhkQ1ByMFgyMVg3cWtKVUxRdUw4U2JWWHJUT3lEbTJJNkFrT0R0SHYxR2c9PSIsInQiOiJQTG93ejJXRjJlR0Q1emZ3WmprOXA3NkhYQkxES01xLzNFQVpIZUcvZkUyWEdRNDhqeXRlK1ZlNTBabGFzT3VZTDVtd0E4Q1UyYUZNbEpydDNERGdDdz09In0=";  // NOLINT
+  std::string expected_credential = "eyJwYXlsb2FkIjoie1wiYmxpbmRlZFBheW1lbnRUb2tlblwiOlwiUEkzbEZxcEdWRkt6NFRINXlFd1hJM1IvUW50bVRwVWdlQmFLK1NUaUJ4OD1cIixcImNoYW5uZWxOYW1lXCI6XCJyZWxlYXNlXCIsXCJjb3VudHJ5Q29kZVwiOlwiVVNcIixcImNyZWF0aXZlSW5zdGFuY2VJZFwiOlwiNTQ2ZmU3YjAtNTA0Ny00ZjI4LWExMWMtODFmMTRlZGNmMGY2XCIsXCJwYXlsb2FkXCI6e30sXCJwbGF0Zm9ybVwiOlwicGxhdGZvcm1cIixcInR5cGVcIjpcInZpZXdcIn0iLCJzaWduYXR1cmUiOiIyNE9SdHZMRGVHRTVnV3B0NEttZGNHT3oxR3E1cTdqS3k0UVh6bGQvdUhKWGtCZFBpYklYTnVGSndYVDFKdUlhVG5oTjJYeWMzL2c3dUI0MXhJeUNLQT09IiwidCI6IlBMb3d6MldGMmVHRDV6Zndaams5cDc2SFhCTERLTXEvM0VBWkhlRy9mRTJYR1E0OGp5dGUrVmU1MFpsYXNPdVlMNW13QThDVTJhRk1sSnJ0M0REZ0N3PT0ifQ==";  // NOLINT
   EXPECT_EQ(expected_credential, credential);
+}
+
+TEST_F(ConfirmationsCreateConfirmationRequestTest,
+    CreateConfirmationRequestDTO_LargeAnonymityCountry) {
+  // Arrange
+  std::string creative_instance_id = "546fe7b0-5047-4f28-a11c-81f14edcf0f6";
+
+  std::string blinded_token_base64 =
+      "PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=";
+  auto blinded_token = BlindedToken::decode_base64(blinded_token_base64);
+
+  // Act
+  ConfirmationInfo info;
+  info.creative_instance_id = creative_instance_id;
+  info.type = ConfirmationType::kViewed;
+  info.blinded_payment_token = blinded_token;
+  info.country_code = "US";
+
+  const std::string platform = GetPlatformName();
+  auto payload =
+      request_->CreateConfirmationRequestDTO(info, "release", platform);
+
+  // Assert
+  std::string expected_payload = base::StringPrintf("{\"blindedPaymentToken\":\"PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=\",\"channelName\":\"release\",\"countryCode\":\"US\",\"creativeInstanceId\":\"546fe7b0-5047-4f28-a11c-81f14edcf0f6\",\"payload\":{},\"platform\":\"%s\",\"type\":\"view\"}", platform.c_str());  // NOLINT
+  EXPECT_EQ(expected_payload, payload);
+}
+
+TEST_F(ConfirmationsCreateConfirmationRequestTest,
+    CreateConfirmationRequestDTO_OtherCountryCode) {
+  // Arrange
+  std::string creative_instance_id = "546fe7b0-5047-4f28-a11c-81f14edcf0f6";
+
+  std::string blinded_token_base64 =
+      "PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=";
+  auto blinded_token = BlindedToken::decode_base64(blinded_token_base64);
+
+  // Act
+  ConfirmationInfo info;
+  info.creative_instance_id = creative_instance_id;
+  info.type = ConfirmationType::kViewed;
+  info.blinded_payment_token = blinded_token;
+  info.country_code = "AS";
+
+  const std::string platform = GetPlatformName();
+  auto payload =
+      request_->CreateConfirmationRequestDTO(info, "release", platform);
+
+  // Assert
+  std::string expected_payload = base::StringPrintf("{\"blindedPaymentToken\":\"PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=\",\"channelName\":\"release\",\"countryCode\":\"??\",\"creativeInstanceId\":\"546fe7b0-5047-4f28-a11c-81f14edcf0f6\",\"payload\":{},\"platform\":\"%s\",\"type\":\"view\"}", platform.c_str());  // NOLINT
+  EXPECT_EQ(expected_payload, payload);
+}
+
+TEST_F(ConfirmationsCreateConfirmationRequestTest,
+    CreateConfirmationRequestDTO_SmallAnonymityCountryAndNotOtherCountryCode) {
+  // Arrange
+  std::string creative_instance_id = "546fe7b0-5047-4f28-a11c-81f14edcf0f6";
+
+  std::string blinded_token_base64 =
+      "PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=";
+  auto blinded_token = BlindedToken::decode_base64(blinded_token_base64);
+
+  // Act
+  ConfirmationInfo info;
+  info.creative_instance_id = creative_instance_id;
+  info.type = ConfirmationType::kViewed;
+  info.blinded_payment_token = blinded_token;
+  info.country_code = "KY";
+
+  const std::string platform = GetPlatformName();
+  auto payload =
+      request_->CreateConfirmationRequestDTO(info, "release", platform);
+
+  // Assert
+  std::string expected_payload = base::StringPrintf("{\"blindedPaymentToken\":\"PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=\",\"channelName\":\"release\",\"creativeInstanceId\":\"546fe7b0-5047-4f28-a11c-81f14edcf0f6\",\"payload\":{},\"platform\":\"%s\",\"type\":\"view\"}", platform.c_str());  // NOLINT
+  EXPECT_EQ(expected_payload, payload);
+}
+
+
+TEST_F(ConfirmationsCreateConfirmationRequestTest,
+    CreateConfirmationRequestDTO_LargeAnonymityCountryForNonReleaseChannel) {
+  // Arrange
+  std::string creative_instance_id = "546fe7b0-5047-4f28-a11c-81f14edcf0f6";
+
+  std::string blinded_token_base64 =
+      "PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=";
+  auto blinded_token = BlindedToken::decode_base64(blinded_token_base64);
+
+  // Act
+  ConfirmationInfo info;
+  info.creative_instance_id = creative_instance_id;
+  info.type = ConfirmationType::kViewed;
+  info.blinded_payment_token = blinded_token;
+  info.country_code = "US";
+
+  const std::string platform = GetPlatformName();
+  auto payload =
+      request_->CreateConfirmationRequestDTO(info, "non-release", platform);
+
+  // Assert
+  std::string expected_payload = base::StringPrintf("{\"blindedPaymentToken\":\"PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=\",\"channelName\":\"non-release\",\"creativeInstanceId\":\"546fe7b0-5047-4f28-a11c-81f14edcf0f6\",\"payload\":{},\"platform\":\"%s\",\"type\":\"view\"}", platform.c_str());  // NOLINT
+  EXPECT_EQ(expected_payload, payload);
+}
+
+TEST_F(ConfirmationsCreateConfirmationRequestTest,
+    CreateConfirmationRequestDTO_OtherCountryCodeForNonReleaseChannel) {
+  // Arrange
+  std::string creative_instance_id = "546fe7b0-5047-4f28-a11c-81f14edcf0f6";
+
+  std::string blinded_token_base64 =
+      "PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=";
+  auto blinded_token = BlindedToken::decode_base64(blinded_token_base64);
+
+  // Act
+  ConfirmationInfo info;
+  info.creative_instance_id = creative_instance_id;
+  info.type = ConfirmationType::kViewed;
+  info.blinded_payment_token = blinded_token;
+  info.country_code = "AS";
+
+  const std::string platform = GetPlatformName();
+  auto payload =
+      request_->CreateConfirmationRequestDTO(info, "non-release", platform);
+
+  // Assert
+  std::string expected_payload = base::StringPrintf("{\"blindedPaymentToken\":\"PI3lFqpGVFKz4TH5yEwXI3R/QntmTpUgeBaK+STiBx8=\",\"channelName\":\"non-release\",\"creativeInstanceId\":\"546fe7b0-5047-4f28-a11c-81f14edcf0f6\",\"payload\":{},\"platform\":\"%s\",\"type\":\"view\"}", platform.c_str());  // NOLINT
+  EXPECT_EQ(expected_payload, payload);
 }
 
 }  // namespace confirmations
