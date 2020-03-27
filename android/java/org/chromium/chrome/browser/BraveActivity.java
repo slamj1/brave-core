@@ -52,6 +52,7 @@ import org.chromium.chrome.browser.settings.BackgroundImagesPreferences;
 import org.chromium.components.bookmarks.BookmarkId;
 import org.chromium.components.bookmarks.BookmarkType;
 import org.chromium.ui.widget.Toast;
+import org.chromium.chrome.browser.rate.RateDialogFragment;
 
 /**
  * Brave's extension for ChromeActivity
@@ -199,6 +200,8 @@ public abstract class BraveActivity extends ChromeActivity {
         if (onboardingActivity == null) {
             OnboardingPrefManager.getInstance().showOnboarding(this, false);
         }
+
+        showBraveRateDialog();
     }
 
     @Override
@@ -350,6 +353,12 @@ public abstract class BraveActivity extends ChromeActivity {
         } else { // Open a new tab
             return getTabCreator(false).launchUrl(url, TabLaunchType.FROM_CHROME_UI);
         }
+    }
+
+    private void showBraveRateDialog() {
+        RateDialogFragment mRateDialogFragment = new RateDialogFragment();
+        mRateDialogFragment.setCancelable(false);
+        mRateDialogFragment.show(getSupportFragmentManager(), "RateDialogFragment");
     }
 
     private native void nativeRestartStatsUpdater();

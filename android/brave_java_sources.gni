@@ -119,7 +119,8 @@ brave_java_sources = [
   "../../brave/android/java/org/chromium/chrome/browser/util/ConfigurationUtils.java",
   "../../brave/android/java/org/chromium/chrome/browser/util/ImageUtils.java",
   "../../brave/android/java/org/chromium/chrome/browser/widget/tile/BraveTileWithTextView.java",
-  "../../brave/android/java/org/chromium/chrome/browser/tabmodel/BraveTabCreator.java"
+  "../../brave/android/java/org/chromium/chrome/browser/tabmodel/BraveTabCreator.java",
+  "../../brave/android/java/org/chromium/chrome/browser/rate/RateDialogFragment.java"
 ]
 
 if (brave_rewards_enabled) {
