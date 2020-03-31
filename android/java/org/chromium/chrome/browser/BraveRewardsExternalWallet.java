@@ -19,15 +19,15 @@ class BraveRewardsExternalWallet {
     public static final String WALLET_UPHOLD = "uphold";
 
     //fields
-    private static final String ACCOUNT_URL = "account_url";
-    private static final String ADD_URL = "add_url";
-    private static final String ADDRESS = "address";
-    private static final String STATUS = "status";
-    private static final String TOKEN = "token";
-    private static final String TYPE = "type";
-    private static final String USER_NAME = "user_name";
-    private static final String VERIFY_URL = "verify_url";
-    private static final String WITHDRAW_URL = "withdraw_url";
+    public static final String ACCOUNT_URL = "account_url";
+    public static final String ADD_URL = "add_url";
+    public static final String ADDRESS = "address";
+    public static final String STATUS = "status";
+    public static final String TOKEN = "token";
+    public static final String TYPE = "type";
+    public static final String USER_NAME = "user_name";
+    public static final String VERIFY_URL = "verify_url";
+    public static final String WITHDRAW_URL = "withdraw_url";
 
     //WalletStatus @
     //vendor/bat-native-ledger/include/bat/ledger/public/interfaces/ledger.mojom

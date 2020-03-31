@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -337,18 +338,6 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
 
         ((TextView)root.findViewById(R.id.br_bat)).setText(batPointsText);
 
-        btAddFunds = (Button)root.findViewById(R.id.br_add_funds);
-        if (btAddFunds != null) {
-          if(btAddFunds.getVisibility() == View.VISIBLE)
-            btAddFunds.setVisibility(isAnonWallet ? View.GONE : View.VISIBLE);
-          btAddFunds.setOnClickListener((new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mBraveActivity.openNewOrSelectExistingTab(BraveActivity.ADD_FUNDS_URL);
-                dismiss();
-            }
-          }));
-        }
         btRewardsSettings = (Button)root.findViewById(R.id.br_rewards_settings);
         if (btRewardsSettings != null) {
             btRewardsSettings.setOnClickListener((new View.OnClickListener() {
@@ -1528,7 +1517,7 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
         mBraveRewardsNativeWorker.GetAllNotifications();
     }
 
-    private void SetVerifyWalletControl(int status){
+    private void SetVerifyWalletControl(final int status){
         Button btnVerifyWallet = (Button)root.findViewById(R.id.btn_verify_wallet);
         boolean annonwallet = BraveRewardsHelper.isAnonWallet();
         if (!annonwallet) {
@@ -1555,7 +1544,7 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
                     btnVerifyWallet.setCompoundDrawablesWithIntrinsicBounds(leftDrawable, 0, rightDrawable, 0);
                     btnVerifyWallet.setBackgroundColor(Color.TRANSPARENT);
 
-                    //show Add funds
+                    //show Add funds button
                     Button btnAddFunds = (Button)root.findViewById(R.id.br_add_funds);
                     btnAddFunds.setVisibility (View.VISIBLE);
                     break;
@@ -1564,8 +1553,8 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
                     leftDrawable = R.drawable.uphold_white;
                     text = R.string.brave_ui_wallet_button_disconnected;
                     btnVerifyWallet.setCompoundDrawablesWithIntrinsicBounds(leftDrawable, 0, 0, 0);
-                    //set background light gray
-
+                    btnVerifyWallet.setBackgroundDrawable(root.getResources().getDrawable(
+                            R.drawable.wallet_disconnected_button));
                     break;
                 default:
                     Log.e (TAG, "Unexpected external wallet status");
@@ -1575,7 +1564,80 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
             tvYourWalletTitle.setVisibility(View.GONE);
             btnVerifyWallet.setVisibility(View.VISIBLE);
             btnVerifyWallet.setText(root.getResources().getString(text));
+            SetVerifyWalletBtnClickHandler(status);
+            SetAddFundsBtnClickHandler(status);
         }
+    }
+
+    private void SetAddFundsBtnClickHandler(final int status) {
+        Button btnAddFunds = (Button)root.findViewById(R.id.br_add_funds);
+        if (status == BraveRewardsExternalWallet.VERIFIED) {
+            btnAddFunds.setEnabled(false);
+            return;
+        }
+
+        btnAddFunds.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+                mBraveActivity.openNewOrSelectExistingTab (mExternal_wallet.mAdd_url);
+        }}));
+    }
+
+    private void SetVerifyWalletBtnClickHandler(final int status) {
+        Button btnVerifyWallet = (Button)root.findViewById(R.id.btn_verify_wallet);
+        btnVerifyWallet.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch(status) {
+                    case BraveRewardsExternalWallet.NOT_CONNECTED:
+                    case BraveRewardsExternalWallet.CONNECTED:
+                    case BraveRewardsExternalWallet.PENDING:
+                    case BraveRewardsExternalWallet.VERIFIED:
+                        Intent intent = BuildVerifyWalletActivityIntent(status);
+                        mActivity.startActivity(intent);
+                        break;
+                    case BraveRewardsExternalWallet.DISCONNECTED_NOT_VERIFIED:
+                    case BraveRewardsExternalWallet.DISCONNECTED_VERIFIED:
+                        if (! TextUtils.isEmpty(mExternal_wallet.mVerify_url)) {
+                            dismiss();
+                            mBraveActivity.openNewOrSelectExistingTab (mExternal_wallet.mVerify_url);
+                        }
+                        break;
+                    default:
+                        Log.e (TAG, "Unexpected external wallet status");
+                        return;
+                }
+        }}));
+    }
+
+    private Intent BuildVerifyWalletActivityIntent(final int status) {
+        Class clazz = null;
+        switch(status) {
+            case BraveRewardsExternalWallet.NOT_CONNECTED:
+                clazz = BraveRewardsVerifyWalletActivity.class;
+                break;
+            case BraveRewardsExternalWallet.CONNECTED:
+            case BraveRewardsExternalWallet.PENDING:
+            case BraveRewardsExternalWallet.VERIFIED:
+                clazz = BraveRewardsVerifyWalletActivity.class;
+                break;
+            default:
+                Log.e (TAG, "Unexpected external wallet status");
+                return null;
+        }
+
+        Intent intent = new Intent(ContextUtils.getApplicationContext(), clazz);
+        intent.putExtra(BraveRewardsExternalWallet.ACCOUNT_URL, mExternal_wallet.mAccount_url);
+        intent.putExtra(BraveRewardsExternalWallet.ADD_URL, mExternal_wallet.mAdd_url);
+        intent.putExtra(BraveRewardsExternalWallet.ADDRESS, mExternal_wallet.mAddress);
+        intent.putExtra(BraveRewardsExternalWallet.STATUS, mExternal_wallet.mStatus);
+        intent.putExtra(BraveRewardsExternalWallet.TOKEN, mExternal_wallet.mToken);
+        intent.putExtra(BraveRewardsExternalWallet.TYPE, mExternal_wallet.mType);
+        intent.putExtra(BraveRewardsExternalWallet.USER_NAME, mExternal_wallet.mUser_name);
+        intent.putExtra(BraveRewardsExternalWallet.VERIFY_URL, mExternal_wallet.mVerify_url);
+        intent.putExtra(BraveRewardsExternalWallet.WITHDRAW_URL, mExternal_wallet.mWithdraw_url);
+        return intent;
     }
 
     @Override

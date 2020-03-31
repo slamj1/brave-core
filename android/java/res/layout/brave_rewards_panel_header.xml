@@ -43,8 +43,9 @@
                     android:background="@drawable/wallet_verify_button"
                     android:text="@string/brave_ui_wallet_button_unverified"
                     android:fontFamily="sans-serif"
-                    android:paddingEnd="12dp"
                     android:drawablePadding="12dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
                     android:textSize="8sp"
                     android:textColor="#FFFFFF"
                     tools:ignore="SmallSp"
@@ -53,8 +54,7 @@
                     android:gravity="center"
                     android:layout_gravity="start"
                     android:layout_marginTop="5dp"
-                    android:textAllCaps="false"
-                    android:enabled="false"
+                    android:textAllCaps="false"                    
                     android:visibility="gone"/>
 
             <LinearLayout
