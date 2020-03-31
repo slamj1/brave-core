@@ -443,6 +443,13 @@ public abstract class BraveToolbarLayout extends ToolbarLayout implements OnClic
       return false;
   }
 
+  public  void dismissRewardsPanel() {
+      if (mRewardsPopup != null) {
+          mRewardsPopup.dismiss();
+          mRewardsPopup = null;
+      }
+  }
+
   public  void onRewardsPanelDismiss() {
       mRewardsPopup = null;
   }

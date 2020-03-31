@@ -5,8 +5,13 @@
 package org.chromium.chrome.browser;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
+import org.chromium.chrome.browser.BraveActivity;
+import org.chromium.chrome.browser.BraveRewardsExternalWallet;
 import org.chromium.chrome.R;
 
 public class BraveRewardsVerifyWalletActivity extends Activity {
@@ -15,5 +20,17 @@ public class BraveRewardsVerifyWalletActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.verify_wallet_activity);
+        SetVerifyWalletBtnClickHandler();
+    }
+
+    void SetVerifyWalletBtnClickHandler () {
+        Button btnVerifyWallet = (Button)findViewById(R.id.verify_wallet_btn);
+        btnVerifyWallet.setOnClickListener( (View v) -> {
+            String verify_url = getIntent().getStringExtra(BraveRewardsExternalWallet.VERIFY_URL);
+            Intent intent = new Intent();
+            intent.putExtra(BraveActivity.OPEN_URL, verify_url);
+            setResult(RESULT_OK, intent);
+            finish();
+        });
     }
 }
