@@ -25,4 +25,6 @@ public interface BraveRewardsObserver {
   public void OnRewardsMainEnabled(boolean enabled);
   public void OnFetchPromotions();
   default public void OnGrantFinish(int result) {};
+  default public void OnGetExternalWallet(int error_code,
+          String external_wallet) {};
 }

@@ -14,6 +14,7 @@
 #include "base/android/jni_android.h"
 #include "base/android/jni_string.h"
 #include "base/android/jni_array.h"
+#include "base/json/json_writer.h"
 #include "brave/components/brave_ads/browser/ads_service.h"
 #include "brave/components/brave_ads/browser/ads_service_factory.h"
 #include "brave/components/brave_rewards/browser/rewards_service_factory.h"
@@ -714,6 +715,42 @@ bool BraveRewardsNativeWorker::IsAnonWallet(JNIEnv* env,
     return brave_rewards_service_->OnlyAnonWallet();
   }
   return false;
+}
+
+void BraveRewardsNativeWorker::GetExternalWallet(JNIEnv* env,
+        const base::android::JavaParamRef<jobject>& obj,
+        const base::android::JavaParamRef<jstring>& wallet_type) {
+
+  if (brave_rewards_service_) {
+    std::string str_wallet_type = base::android::ConvertJavaStringToUTF8(env, wallet_type);
+    auto callback = base::Bind(
+      &BraveRewardsNativeWorker::OnGetExternalWallet,
+      base::Unretained(this));
+    return brave_rewards_service_->GetExternalWallet(str_wallet_type, callback);
+  }
+}
+
+void BraveRewardsNativeWorker::OnGetExternalWallet(int32_t result,
+        std::unique_ptr<brave_rewards::ExternalWallet> wallet) {
+
+  //serialize to json
+  std::string json_wallet;
+  base::Value dict(base::Value::Type::DICTIONARY);
+  dict.SetKey("token", base::Value(wallet->token));
+  dict.SetKey("address", base::Value(wallet->address));
+  dict.SetKey("status", base::Value((int32_t)(wallet->status)));  //enum class WalletStatus : int32_t
+  dict.SetKey("type", base::Value(wallet->type));
+  dict.SetKey("verify_url", base::Value(wallet->verify_url));
+  dict.SetKey("add_url", base::Value(wallet->add_url));
+  dict.SetKey("withdraw_url", base::Value(wallet->withdraw_url));
+  dict.SetKey("user_name", base::Value(wallet->user_name));
+  dict.SetKey("account_url", base::Value(wallet->account_url));
+  base::JSONWriter::Write(dict, &json_wallet);
+
+  JNIEnv* env = base::android::AttachCurrentThread();
+  Java_BraveRewardsNativeWorker_OnGetExternalWallet(env,
+        weak_java_brave_rewards_native_worker_.get(env), result,
+        base::android::ConvertUTF8ToJavaString(env, json_wallet));
 }
 
 static void JNI_BraveRewardsNativeWorker_Init(

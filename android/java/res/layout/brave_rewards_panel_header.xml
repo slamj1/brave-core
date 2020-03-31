@@ -43,7 +43,8 @@
                     android:background="@drawable/wallet_verify_button"
                     android:text="@string/brave_ui_wallet_button_unverified"
                     android:fontFamily="sans-serif"
-                    android:paddingEnd="10dp"
+                    android:paddingEnd="12dp"
+                    android:drawablePadding="12dp"
                     android:textSize="8sp"
                     android:textColor="#FFFFFF"
                     tools:ignore="SmallSp"
@@ -200,6 +201,7 @@
                         android:enabled="false"
                         android:clickable="false"
                         android:drawablePadding="5sp"
+                        android:visibility="gone"
                         tools:ignore="ButtonStyle"/>
 
                     <Button

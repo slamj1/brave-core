@@ -16,6 +16,7 @@
 #include "base/memory/weak_ptr.h"
 #include "brave/components/brave_rewards/browser/balance.h"
 #include "brave/components/brave_rewards/browser/balance_report.h"
+#include "brave/components/brave_rewards/browser/external_wallet.h"
 #include "brave/components/brave_rewards/browser/rewards_service_observer.h"
 #include "brave/components/brave_rewards/browser/rewards_notification_service_observer.h"
 #include "brave/components/brave_rewards/browser/rewards_service_private_observer.h"
@@ -165,6 +166,10 @@ class BraveRewardsNativeWorker : public brave_rewards::RewardsServiceObserver,
                        const base::android::JavaParamRef<jobject>& obj,
                        jint value);
 
+    void GetExternalWallet(JNIEnv* env,
+        const base::android::JavaParamRef<jobject>& obj,
+        const base::android::JavaParamRef<jstring>& wallet_type);
+
     void OnAdsResetTheWholeState(bool sucess);
 
     void OnResetTheWholeState(bool sucess);
@@ -232,6 +237,9 @@ class BraveRewardsNativeWorker : public brave_rewards::RewardsServiceObserver,
 
     void OnClaimPromotion(const int32_t result,
         std::unique_ptr<brave_rewards::Promotion> promotion);
+
+    void OnGetExternalWallet(const int32_t result,
+        std::unique_ptr<brave_rewards::ExternalWallet> wallet);
 
  private:
     void OnBalance(int32_t result,
