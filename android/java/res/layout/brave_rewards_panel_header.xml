@@ -54,7 +54,7 @@
                     android:gravity="center"
                     android:layout_gravity="start"
                     android:layout_marginTop="5dp"
-                    android:textAllCaps="false"                    
+                    android:textAllCaps="false"
                     android:visibility="gone"/>
 
             <LinearLayout
@@ -198,7 +198,6 @@
                         android:textSize="12sp"
                         android:textColor="#FFFFFF"
                         android:drawableStart="@drawable/add_funds"
-                        android:enabled="false"
                         android:clickable="false"
                         android:drawablePadding="5sp"
                         android:visibility="gone"

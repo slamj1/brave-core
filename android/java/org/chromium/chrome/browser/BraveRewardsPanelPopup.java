@@ -1621,7 +1621,7 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
             case BraveRewardsExternalWallet.CONNECTED:
             case BraveRewardsExternalWallet.PENDING:
             case BraveRewardsExternalWallet.VERIFIED:
-                clazz = BraveRewardsVerifyWalletActivity.class;
+                clazz = BraveRewardsUserWalletActivity.class;
                 break;
             default:
                 Log.e (TAG, "Unexpected external wallet status");

@@ -969,6 +969,39 @@ until they verify, or until 90 days have passed.
       <message name="IDS_VERIFY_WALLET_BRAVE_NOTE1">
         Brave Software Inc. does not process, store, or access any of the personal information that you provide to Uphold when you establish an account with them.
       </message>
+      <message name="IDS_USER_WALLET_COMPLETE_VERIFICATION">
+        Complete wallet verification
+      </message>
+      <message name="IDS_USER_WALLET_ACTIVITY_NAME">
+        User Wallet
+      </message>
+      <message name="IDS_USER_WALLET_GOTO_UPHOLD">
+        Go to my Uphold account
+      </message>
+      <message name="IDS_USER_WALLET_DISCONNECT_REWARDS">
+        Disconnect from Brave Rewards
+      </message>
+      <message name="IDS_USER_WALLET_WITHDRAW_FUNDS">
+        Withdraw Funds
+      </message>
+      <message name="IDS_USER_WALLET_STATUS_NOT_CONNECTED">
+        Not connected
+      </message>
+      <message name="IDS_USER_WALLET_STATUS_CONNECTED">
+        Connected
+      </message>
+      <message name="IDS_USER_WALLET_STATUS_VERIFIED">
+        Verified
+      </message>
+      <message name="IDS_USER_WALLET_STATUS_DISCONNECTED_NOT_VERIFIED">
+        Disconnected not verified
+      </message>
+      <message name="IDS_USER_WALLET_STATUS_DISCONNECTED_VERIFIED">
+        Disconnected verified
+      </message>
+      <message name="IDS_USER_WALLET_STATUS_PENDING">
+        Pending
+      </message>
     </messages>
   </release>
 </grit>

@@ -5,15 +5,18 @@
   */
 package org.chromium.chrome.browser;
 
+import android.content.Context;
 import android.util.JsonReader;
 import androidx.annotation.IntDef;
 import androidx.annotation.VisibleForTesting;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import java.io.IOException;
-import java.io.StringReader;
+import org.chromium.base.ContextUtils;
+import org.chromium.chrome.R;
 
 class BraveRewardsExternalWallet {
     public static final String WALLET_UPHOLD = "uphold";
@@ -101,6 +104,40 @@ class BraveRewardsExternalWallet {
                 ", mVerify_url='" + mVerify_url + '\'' +
                 ", mWithdraw_url='" + mWithdraw_url + '\'' +
                 '}';
+    }
+
+    public static String WalletStatusToString (@WalletStatus int status){
+        String value = "";
+        Context context = ContextUtils.getApplicationContext();
+        switch (status){
+            case NOT_CONNECTED:
+                value = context.getResources().getString(
+                    R.string.user_wallet_status_not_connected);
+                break;
+            case CONNECTED:
+                value = context.getResources().getString(
+                    R.string.user_wallet_status_connected);
+                break;
+            case VERIFIED:
+                value = context.getResources().getString(
+                    R.string.user_wallet_status_verified);
+                break;
+            case DISCONNECTED_NOT_VERIFIED:
+                value = context.getResources().getString(
+                    R.string.user_wallet_status_disconnected_not_verified);
+                break;
+            case DISCONNECTED_VERIFIED:
+                value = context.getResources().getString(
+                    R.string.user_wallet_status_disconnected_verified);
+                break;
+            case PENDING:
+                value = context.getResources().getString(
+                    R.string.user_wallet_status_pending);
+                break;
+            default:
+                break;
+        }
+        return value;
     }
 
     public String mAccount_url;
