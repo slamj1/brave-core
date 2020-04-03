@@ -1594,9 +1594,12 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
                     case BraveRewardsExternalWallet.CONNECTED:
                     case BraveRewardsExternalWallet.PENDING:
                     case BraveRewardsExternalWallet.VERIFIED:
+                        int requestCode =
+                                (status == BraveRewardsExternalWallet.NOT_CONNECTED) ?
+                                BraveActivity.VERIFY_WALLET_ACTIVITY_REQUEST_CODE :
+                                BraveActivity.USER_WALLET_ACTIVITY_REQUEST_CODE;
                         Intent intent = BuildVerifyWalletActivityIntent(status);
-                        mActivity.startActivityForResult(intent,
-                                BraveActivity.VERIFY_WALLET_ACTIVITY_REQUEST_CODE);
+                        mActivity.startActivityForResult(intent, requestCode);
                         break;
                     case BraveRewardsExternalWallet.DISCONNECTED_NOT_VERIFIED:
                     case BraveRewardsExternalWallet.DISCONNECTED_VERIFIED:

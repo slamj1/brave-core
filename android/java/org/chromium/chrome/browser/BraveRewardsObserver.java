@@ -27,4 +27,6 @@ public interface BraveRewardsObserver {
   default public void OnGrantFinish(int result) {};
   default public void OnGetExternalWallet(int error_code,
           String external_wallet) {};
+  default public void OnDisconnectWallet(int error_code,
+          String external_wallet) {};
 }

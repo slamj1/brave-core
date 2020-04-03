@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import org.chromium.chrome.browser.BraveActivity;
 import org.chromium.chrome.browser.BraveRewardsExternalWallet;
+import org.chromium.chrome.browser.BraveRewardsNativeWorker;
 import org.chromium.chrome.R;
 
 
@@ -111,7 +112,10 @@ public class BraveRewardsUserWalletActivity extends AppCompatActivity {
         Button btnDisconnect = (Button)findViewById(
                 R.id.user_wallet_disconnect);
         btnDisconnect.setOnClickListener( (View v) -> {
-            //disconnect wallet
+            BraveRewardsNativeWorker.getInstance().DisconnectWallet
+                    (BraveRewardsExternalWallet.WALLET_UPHOLD);
+            Intent intent = new Intent();
+            setResult(RESULT_OK, intent);
             finish();
       });
     }

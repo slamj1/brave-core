@@ -392,9 +392,9 @@ public abstract class BraveActivity extends ChromeActivity {
         if (resultCode == RESULT_OK &&
                 (requestCode == VERIFY_WALLET_ACTIVITY_REQUEST_CODE ||
                 requestCode == USER_WALLET_ACTIVITY_REQUEST_CODE) ) {
+            dismissRewardsPanel();
             String open_url = data.getStringExtra(BraveActivity.OPEN_URL);
             if (! TextUtils.isEmpty(open_url)) {
-                dismissRewardsPanel();
                 openNewOrSelectExistingTab(open_url);
             }
         }

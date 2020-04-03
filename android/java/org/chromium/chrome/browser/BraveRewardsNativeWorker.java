@@ -404,6 +404,12 @@ public class BraveRewardsNativeWorker {
         }
     }
 
+    public void DisconnectWallet(String wallet_type) {
+        synchronized (lock) {
+            nativeDisconnectWallet(mNativeBraveRewardsNativeWorker, wallet_type);
+        }
+    }
+
     @CalledByNative
     public void OnGetRewardsMainEnabled(boolean enabled) {
         int oldRewardsStatus = rewardsStatus;
@@ -574,6 +580,13 @@ public class BraveRewardsNativeWorker {
         }
     }
 
+    @CalledByNative
+    public void OnDisconnectWallet(int error_code, String external_wallet) {
+        for (BraveRewardsObserver observer : mObservers) {
+            observer.OnDisconnectWallet(error_code, external_wallet);
+        }
+    }
+
     private native void nativeInit();
     private native void nativeDestroy(long nativeBraveRewardsNativeWorker);
     private native void nativeCreateWallet(long nativeBraveRewardsNativeWorker);
@@ -618,4 +631,5 @@ public class BraveRewardsNativeWorker {
     private native void nativeSetAdsPerHour(long nativeBraveRewardsNativeWorker, int value);
     private native boolean nativeIsAnonWallet(long nativeBraveRewardsNativeWorker);
     private native void nativeGetExternalWallet(long nativeBraveRewardsNativeWorker, String wallet_type);
+    private native void nativeDisconnectWallet(long nativeBraveRewardsNativeWorker, String wallet_type);
 }

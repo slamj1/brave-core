@@ -170,6 +170,10 @@ class BraveRewardsNativeWorker : public brave_rewards::RewardsServiceObserver,
         const base::android::JavaParamRef<jobject>& obj,
         const base::android::JavaParamRef<jstring>& wallet_type);
 
+    void DisconnectWallet(JNIEnv* env,
+        const base::android::JavaParamRef<jobject>& obj,
+        const base::android::JavaParamRef<jstring>& wallet_type);
+
     void OnAdsResetTheWholeState(bool sucess);
 
     void OnResetTheWholeState(bool sucess);
@@ -240,6 +244,11 @@ class BraveRewardsNativeWorker : public brave_rewards::RewardsServiceObserver,
 
     void OnGetExternalWallet(const int32_t result,
         std::unique_ptr<brave_rewards::ExternalWallet> wallet);
+
+    void OnDisconnectWallet(
+      brave_rewards::RewardsService* rewards_service,
+      int32_t result,
+      const std::string& wallet_type) override;
 
  private:
     void OnBalance(int32_t result,
