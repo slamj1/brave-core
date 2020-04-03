@@ -29,4 +29,6 @@ public interface BraveRewardsObserver {
           String external_wallet) {};
   default public void OnDisconnectWallet(int error_code,
           String external_wallet) {};
+  default public void OnProcessRewardsPageUrl(int error_code,
+          String wallet_type, String action, String json_args ) {};
 }

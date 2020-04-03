@@ -174,6 +174,11 @@ class BraveRewardsNativeWorker : public brave_rewards::RewardsServiceObserver,
         const base::android::JavaParamRef<jobject>& obj,
         const base::android::JavaParamRef<jstring>& wallet_type);
 
+    void ProcessRewardsPageUrl(JNIEnv* env,
+        const base::android::JavaParamRef<jobject>& obj,
+        const base::android::JavaParamRef<jstring>& path,
+        const base::android::JavaParamRef<jstring>& query);
+
     void OnAdsResetTheWholeState(bool sucess);
 
     void OnResetTheWholeState(bool sucess);
@@ -250,7 +255,14 @@ class BraveRewardsNativeWorker : public brave_rewards::RewardsServiceObserver,
       int32_t result,
       const std::string& wallet_type) override;
 
+    void OnProcessRewardsPageUrl(int32_t result,
+        const std::string& wallet_type, const std::string& action,
+        const std::map<std::string, std::string>& args);
+
  private:
+    std::string StdStrStrMapToJsonString(
+        const std::map<std::string,std::string>& args);
+
     void OnBalance(int32_t result,
         std::unique_ptr<brave_rewards::Balance> balance);
     JavaObjectWeakGlobalRef weak_java_brave_rewards_native_worker_;

@@ -410,6 +410,13 @@ public class BraveRewardsNativeWorker {
         }
     }
 
+    public void ProcessRewardsPageUrl(String path, String query) {
+        synchronized (lock) {
+            nativeProcessRewardsPageUrl(mNativeBraveRewardsNativeWorker,
+                    path, query);
+        }
+    }
+
     @CalledByNative
     public void OnGetRewardsMainEnabled(boolean enabled) {
         int oldRewardsStatus = rewardsStatus;
@@ -587,6 +594,15 @@ public class BraveRewardsNativeWorker {
         }
     }
 
+    @CalledByNative
+    public void OnProcessRewardsPageUrl(int error_code, String wallet_type,
+            String action, String json_args) {
+        for (BraveRewardsObserver observer : mObservers) {
+            observer.OnProcessRewardsPageUrl(error_code, wallet_type,
+                    action, json_args);
+        }
+    }
+
     private native void nativeInit();
     private native void nativeDestroy(long nativeBraveRewardsNativeWorker);
     private native void nativeCreateWallet(long nativeBraveRewardsNativeWorker);
@@ -632,4 +648,5 @@ public class BraveRewardsNativeWorker {
     private native boolean nativeIsAnonWallet(long nativeBraveRewardsNativeWorker);
     private native void nativeGetExternalWallet(long nativeBraveRewardsNativeWorker, String wallet_type);
     private native void nativeDisconnectWallet(long nativeBraveRewardsNativeWorker, String wallet_type);
+    private native void nativeProcessRewardsPageUrl(long nativeBraveRewardsNativeWorker, String path, String query);
 }
