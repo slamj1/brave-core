@@ -1,0 +1,12 @@
+diff --git a/components/page_info/BUILD.gn b/components/page_info/BUILD.gn
+index 8fecfec436e938370d5a52baa54fe1b312bbf832..e411a3cbd7c93e8c3e6896da8c3fc14042a96a0d 100644
+--- a/components/page_info/BUILD.gn
++++ b/components/page_info/BUILD.gn
+@@ -37,6 +37,7 @@ static_library("page_info") {
+     "//services/device/public/cpp:device_features",
+     "//services/metrics/public/cpp:ukm_builders",
+   ]
++  deps += [ "//brave/components/vector_icons:brave_vector_icons" ]
+ 
+   if (is_android) {
+     deps += [
