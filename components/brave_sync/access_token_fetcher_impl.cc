@@ -27,6 +27,7 @@ namespace {
 constexpr char kGetAccessTokenBodyFormat[] =
     "client_id=%s&"
     "client_secret=%s&"
+    "timestamp=%s&"
     "refresh_token=%s";
 
 constexpr char kAccessTokenKey[] = "access_token";
@@ -129,9 +130,11 @@ void AccessTokenFetcherImpl::CancelRequest() {
 
 void AccessTokenFetcherImpl::Start(
     const std::string& client_id,
-    const std::string& client_secret) {
+    const std::string& client_secret,
+    const std::string& timestamp) {
   client_id_ = client_id;
   client_secret_ = client_secret;
+  timestamp_ = timestamp;
   StartGetAccessToken();
 }
 
@@ -141,7 +144,7 @@ void AccessTokenFetcherImpl::StartGetAccessToken() {
   url_loader_ =
       CreateURLLoader(MakeGetAccessTokenUrl(),
                       MakeGetAccessTokenBody(client_id_, client_secret_,
-                                             refresh_token_));
+                                             timestamp_, refresh_token_));
   // It's safe to use Unretained below as the |url_loader_| is owned by |this|.
   url_loader_->DownloadToString(
       url_loader_factory_.get(),
@@ -267,15 +270,19 @@ GURL AccessTokenFetcherImpl::MakeGetAccessTokenUrl() {
 std::string AccessTokenFetcherImpl::MakeGetAccessTokenBody(
     const std::string& client_id,
     const std::string& client_secret,
+    const std::string& timestamp,
     const std::string& refresh_token) {
   std::string enc_client_id = net::EscapeUrlEncodedData(client_id, true);
   std::string enc_client_secret =
       net::EscapeUrlEncodedData(client_secret, true);
+  std::string enc_timestamp =
+      net::EscapeUrlEncodedData(timestamp, true);
   std::string enc_refresh_token =
       net::EscapeUrlEncodedData(refresh_token, true);
   return base::StringPrintf(kGetAccessTokenBodyFormat,
                             enc_client_id.c_str(),
                             enc_client_secret.c_str(),
+                            enc_timestamp.c_str(),
                             enc_refresh_token.c_str());
 }
 

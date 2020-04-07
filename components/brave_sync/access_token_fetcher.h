@@ -13,7 +13,8 @@ class AccessTokenFetcher {
    virtual ~AccessTokenFetcher();
 
   virtual void Start(const std::string& client_id,
-                     const std::string& client_secret) = 0;
+                     const std::string& client_secret,
+                     const std::string& timestamp) = 0;
 
   // Cancels the current request and informs the consumer.
   virtual void CancelRequest() = 0;
