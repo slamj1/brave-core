@@ -636,7 +636,11 @@ void CustomizeWebUIHTMLSource(const std::string &name,
         { "tapNetworkTitle", IDS_BRAVE_UI_TAP_NETWORK_TITLE },
         { "tapNetworkInfo", IDS_BRAVE_UI_TAP_NETWORK_INFO },
         { "tapNetworkLink", IDS_BRAVE_UI_TAP_NETWORK_LINK },
-        { "tapNetworkDisclaimer", IDS_BRAVE_UI_TAP_NETWORK_DISCLAIMER }
+        { "tapNetworkDisclaimer", IDS_BRAVE_UI_TAP_NETWORK_DISCLAIMER },
+
+        { "p2pTitle", IDS_BRAVE_UI_P2P_TITLE },
+        { "p2pLink", IDS_BRAVE_UI_P2P_LINK },
+        { "p2pDisclaimer", IDS_BRAVE_UI_P2P_DISCLAIMER }
       }
     }, {
       std::string("sync"), {
