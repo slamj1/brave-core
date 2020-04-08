@@ -6,6 +6,7 @@
 #include <utility>
 
 #include "base/json/json_reader.h"
+#include "base/strings/string_number_conversions.h"
 #include "base/values.h"
 #include "bat/ledger/global_constants.h"
 #include "bat/ledger/internal/sku/sku_util.h"
@@ -81,7 +82,7 @@ ledger::SKUOrderPtr ParseOrderCreateResponse(
 
       const auto* price = item.FindStringKey("price");
       if (price) {
-        order_item->price = std::stod(*price);
+        base::StringToDouble(*price, &order_item->price);
       }
 
       const auto* name = item.FindStringKey("name");
