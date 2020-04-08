@@ -74,6 +74,7 @@ void SyncAuthManager::GenerateClientIdAndSecret(
   *timestamp =
       base::HexEncode(server_timestamp.data(), server_timestamp.size());
 
+  std::vector<uint8_t> timestamp_bytes;
   base::HexStringToBytes(*timestamp, &timestamp_bytes);
   std::vector<uint8_t> signature;
   brave_sync::crypto::Sign(timestamp_bytes, private_key_, &signature);
