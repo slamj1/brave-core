@@ -16,6 +16,8 @@ class AccessTokenFetcher {
                      const std::string& client_secret,
                      const std::string& timestamp) = 0;
 
+  virtual void StartGetTimestamp() = 0;
+
   // Cancels the current request and informs the consumer.
   virtual void CancelRequest() = 0;
 
@@ -26,6 +28,9 @@ class AccessTokenFetcher {
 
   // Fires |OnGetTokenFailure| on |consumer_|.
   void FireOnGetTokenFailure(const std::string& error);
+
+  void FireOnGetTimestampSuccess(const std::string& ts);
+  void FireOnGetTimestampFailure(const std::string& error);
  private:
 
   AccessTokenConsumer* const consumer_;
