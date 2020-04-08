@@ -1,6 +1,5 @@
 #include "brave/chromium_src/components/sync/driver/sync_auth_manager.h"
 
-#include "base/base64.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/time/time.h"
 #include "brave/components/brave_sync/crypto/crypto.h"
@@ -58,27 +57,21 @@ void SyncAuthManager::GenerateClientIdAndSecret(std::string* client_id,
   DCHECK(client_id);
   DCHECK(client_secret);
 
-  const std::string client_id_hex =
+  *client_id =
       base::HexEncode(&public_key_, public_key_.size());
-  base::Base64Encode(client_id_hex, client_id);
-  DCHECK(!client_id->empty());
 
   double timestamp_d = base::Time::Now().ToDoubleT();
-  const std::string timestamp_hex =
+  *timestamp =
       base::HexEncode(&timestamp_d, sizeof(double));
-  base::Base64Encode(timestamp_hex, timestamp);
-  DCHECK(!timestamp->empty());
 
   std::vector<uint8_t> timestamp_bytes;
-  base::HexStringToBytes(timestamp_hex, &timestamp_bytes);
+  base::HexStringToBytes(*timestamp, &timestamp_bytes);
   std::vector<uint8_t> signature;
   brave_sync::crypto::Sign(timestamp_bytes, private_key_, &signature);
   DCHECK(brave_sync::crypto::Verify(timestamp_bytes, signature, public_key_));
 
-  const std::string signature_hex =
+  *client_secret =
       base::HexEncode(&signature, signature.size());
-  base::Base64Encode(signature_hex, client_secret);
-  DCHECK(!client_secret->empty());
 
   VLOG(1) << "client_id= " << *client_id;
   VLOG(1) << "client_secret= " << *client_secret;
