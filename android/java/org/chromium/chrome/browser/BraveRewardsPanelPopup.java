@@ -56,8 +56,10 @@ import org.chromium.base.SysUtils;
 import org.chromium.base.task.AsyncTask;
 import org.chromium.chrome.browser.BraveAdsNativeHelper;
 import org.chromium.chrome.browser.BraveRewardsExternalWallet;
+import org.chromium.chrome.browser.BraveRewardsExternalWallet.WalletStatus;
 import org.chromium.chrome.browser.BraveRewardsHelper;
 import org.chromium.chrome.browser.BraveRewardsObserver;
+import org.chromium.chrome.browser.BraveUphold;
 import org.chromium.chrome.browser.BraveActivity;
 import org.chromium.chrome.browser.ChromeTabbedActivity;
 import org.chromium.chrome.browser.dialogs.BraveAdsSignupDialog;
@@ -523,7 +525,7 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
                     }
                 });
 
-        mBraveRewardsNativeWorker.GetExternalWallet(BraveRewardsExternalWallet.WALLET_UPHOLD);
+        mBraveRewardsNativeWorker.GetExternalWallet(BraveUphold.WALLET_UPHOLD);
     }
 
     private void startJoinRewardsAnimation(){
@@ -1517,7 +1519,7 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
         mBraveRewardsNativeWorker.GetAllNotifications();
     }
 
-    private void SetVerifyWalletControl(final int status){
+    private void SetVerifyWalletControl(@WalletStatus final int status){
         Button btnVerifyWallet = (Button)root.findViewById(R.id.btn_verify_wallet);
         boolean annonwallet = BraveRewardsHelper.isAnonWallet();
         if (!annonwallet) {
@@ -1569,7 +1571,7 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
         }
     }
 
-    private void SetAddFundsBtnClickHandler(final int status) {
+    private void SetAddFundsBtnClickHandler(@WalletStatus final int status) {
         Button btnAddFunds = (Button)root.findViewById(R.id.br_add_funds);
         if (status == BraveRewardsExternalWallet.VERIFIED) {
             btnAddFunds.setEnabled(false);
@@ -1584,7 +1586,7 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
         }}));
     }
 
-    private void SetVerifyWalletBtnClickHandler(final int status) {
+    private void SetVerifyWalletBtnClickHandler(@WalletStatus final int status) {
         Button btnVerifyWallet = (Button)root.findViewById(R.id.btn_verify_wallet);
         btnVerifyWallet.setOnClickListener((new View.OnClickListener() {
             @Override
@@ -1615,7 +1617,7 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
         }}));
     }
 
-    private Intent BuildVerifyWalletActivityIntent(final int status) {
+    private Intent BuildVerifyWalletActivityIntent(@WalletStatus final int status) {
         Class clazz = null;
         switch(status) {
             case BraveRewardsExternalWallet.NOT_CONNECTED:
@@ -1646,11 +1648,11 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
 
     @Override
     public void OnGetExternalWallet(int error_code, String external_wallet) {
-        try{
+        try {
             mExternal_wallet = new BraveRewardsExternalWallet(external_wallet);
             SetVerifyWalletControl(mExternal_wallet.mStatus);
         }
-        catch (IOException e){
+        catch (IOException e) {
             Log.e (TAG, "Error parsing external wallet status");
             mExternal_wallet = null;
         }

@@ -1,0 +1,13 @@
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/externalnav/ExternalNavigationHandler.java b/chrome/android/java/src/org/chromium/chrome/browser/externalnav/ExternalNavigationHandler.java
+index 929f86899690e5baa367af74186ccfb8b29df8ae..ddfcdd09679c758ef8d91a5d0e99ec8bb7e3d416 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/externalnav/ExternalNavigationHandler.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/externalnav/ExternalNavigationHandler.java
+@@ -983,7 +983,7 @@ public class ExternalNavigationHandler {
+      * @return {@link OverrideUrlLoadingResult} if the tab was clobbered, or we launched an
+      *         intent.
+      */
+-    private @OverrideUrlLoadingResult int clobberCurrentTabWithFallbackUrl(
++    public @OverrideUrlLoadingResult int clobberCurrentTabWithFallbackUrl(
+             String browserFallbackUrl, ExternalNavigationParams params) {
+         // If the fallback URL is a link to Play Store, send the user to Play Store app
+         // instead: crbug.com/638672.

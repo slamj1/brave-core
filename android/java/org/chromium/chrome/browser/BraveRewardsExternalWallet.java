@@ -19,8 +19,6 @@ import org.chromium.base.ContextUtils;
 import org.chromium.chrome.R;
 
 class BraveRewardsExternalWallet {
-    public static final String WALLET_UPHOLD = "uphold";
-
     //fields
     public static final String ACCOUNT_URL = "account_url";
     public static final String ADD_URL = "add_url";
@@ -86,7 +84,9 @@ class BraveRewardsExternalWallet {
             reader.endObject();
         }
         finally {
-            reader.close();
+            if (reader!=null) {
+                reader.close();
+            }
         }
     }
 

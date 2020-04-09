@@ -1,0 +1,21 @@
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/TabbedModeTabDelegateFactory.java b/chrome/android/java/src/org/chromium/chrome/browser/TabbedModeTabDelegateFactory.java
+index 5508b5cf92dcdc1d1de36bcfe57fb83202dc7f26..3e478237114915329880179f737b593078d96f8b 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/TabbedModeTabDelegateFactory.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/TabbedModeTabDelegateFactory.java
+@@ -8,6 +8,7 @@ import org.chromium.base.supplier.Supplier;
+ import org.chromium.chrome.browser.contextmenu.ChromeContextMenuPopulator;
+ import org.chromium.chrome.browser.contextmenu.ContextMenuPopulator;
+ import org.chromium.chrome.browser.externalnav.ExternalNavigationHandler;
++import org.chromium.chrome.browser.externalnav.BraveExternalNavigationHandler;
+ import org.chromium.chrome.browser.fullscreen.ComposedBrowserControlsVisibilityDelegate;
+ import org.chromium.chrome.browser.share.ShareDelegate;
+ import org.chromium.chrome.browser.tab.BrowserControlsVisibilityDelegate;
+@@ -42,7 +43,7 @@ public class TabbedModeTabDelegateFactory implements TabDelegateFactory {
+ 
+     @Override
+     public ExternalNavigationHandler createExternalNavigationHandler(Tab tab) {
+-        return new ExternalNavigationHandler(tab);
++        return new BraveExternalNavigationHandler(tab);
+     }
+ 
+     @Override
