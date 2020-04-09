@@ -399,10 +399,15 @@
       <message name="IDS_BRAVE_REWARDS_CHECKOUT_CONTINUE_WITH_CARD" desc="">Continue with credit card</message>
       <message name="IDS_BRAVE_REWARDS_CHECKOUT_CONTINUE_WITH_CARD_SUBTEXT" desc="">Make a one-time purchase using a credit card instead.</message>
       <message name="IDS_BRAVE_REWARDS_CHECKOUT_PAY_WITH_BAT_BUTTON_TEXT" desc="">Pay with BAT</message>
-      <message name="IDS_BRAVE_REWARDS_CHECKOUT_PAY_WITH_BAT_TOS" desc="">By clicking Pay with BAT, you agree to &lt;a href="javascript:void 0">Brave’s Terms of Sale&lt;/a&gt;.</message>
+      <message name="IDS_BRAVE_REWARDS_CHECKOUT_PAY_WITH_BAT_TOS" desc="">By clicking Pay with BAT, you agree to &lt;a href="javascript:void 0"&gt;Brave’s Terms of Sale&lt;/a&gt;.</message>
       <message name="IDS_BRAVE_REWARDS_CHECKOUT_NOT_ENOUGH_FUNDS" desc="">You don't have enough tokens to buy this item.</message>
       <message name="IDS_BRAVE_REWARDS_CHECKOUT_USE_TOKEN_BALANCE" desc="">Use your token balance</message>
       <message name="IDS_BRAVE_REWARDS_CHECKOUT_UPDATED" desc="">Updated</message>
+      <message name="IDS_BRAVE_REWARDS_CHECKOUT_ENABLE_REWARDS_TITLE" desc="">Enable Brave Rewards to continue.</message>
+      <message name="IDS_BRAVE_REWARDS_CHECKOUT_ENABLE_REWARDS_TEXT" desc="">To purchase this item, you need to earn tokens. Turn on Brave Rewards to earn.</message>
+      <message name="IDS_BRAVE_REWARDS_CHECKOUT_ENABLE_REWARDS_LEARN_MORE" desc="">&lt;a href="javascript:void 0"&gt;Learn more.&lt;/a&gt;</message>
+      <message name="IDS_BRAVE_REWARDS_CHECKOUT_ENABLE_REWARDS_BUTTON_TEXT" desc="">Enable Brave Rewards</message>
+      <message name="IDS_BRAVE_REWARDS_CHECKOUT_ENABLE_REWARDS_TERMS" desc="">By clicking Enable Brave Rewards, you agree to &lt;a href="javascript:void 0"&gt;Brave Reward’s Terms of Service&lt;/a&gt;.</message>
 
       <!-- WebUI brave ui resources -->
       <message name="IDS_BRAVE_UI_ABOUT" desc="">about</message>

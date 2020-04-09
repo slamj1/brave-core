@@ -4,12 +4,22 @@
 
 import * as React from 'react'
 
-import { WalletInfo, OrderInfo, ExchangeRateInfo, CheckoutHost } from '../interfaces'
+import { LocaleContext } from '../../ui/components/checkout/localeContext'
 import { DialogFrame } from '../../ui/components/checkout/dialogFrame'
+import { EnableRewardsPanel } from '../../ui/components/checkout/enableRewardsPanel'
 import { PaymentMethodPanel } from '../../ui/components/checkout/paymentMethodPanel'
+import { LoadingPanel } from '../../ui/components/checkout/loadingPanel'
 import { AddFundsPanel } from '../../ui/components/checkout/addFundsPanel'
 import { PaymentProcessing } from '../../ui/components/checkout/paymentProcessing'
 import { PaymentComplete } from '../../ui/components/checkout/paymentComplete'
+
+import {
+  WalletInfo,
+  OrderInfo,
+  ExchangeRateInfo,
+  Settings,
+  Host
+} from '../interfaces'
 
 import {
   createExchangeFormatter,
@@ -24,16 +34,55 @@ type FlowState =
   'payment-complete'
 
 interface AppProps {
-  host: CheckoutHost
+  host: Host
   exchangeCurrency: string
 }
 
 export function App (props: AppProps) {
+  const locale = React.useContext(LocaleContext)
+
   const [flowState, setFlowState] = React.useState<FlowState>('start')
-  const [rateInfo, setRateInfo] = React.useState<ExchangeRateInfo | null>(null)
-  const [walletInfo, setWalletInfo] = React.useState<WalletInfo | null>(null)
-  const [orderInfo, setOrderInfo] = React.useState<OrderInfo | null>(null)
-  const [rewardsEnabled, setRewardsEnabled] = React.useState(false)
+  const [rateInfo, setRateInfo] = React.useState<ExchangeRateInfo | undefined>()
+  const [walletInfo, setWalletInfo] = React.useState<WalletInfo | undefined>()
+  const [orderInfo, setOrderInfo] = React.useState<OrderInfo | undefined>()
+  const [settings, setSettings] = React.useState<Settings | undefined>()
+
+  React.useEffect(() => {
+    return props.host.addListener((state) => {
+      setRateInfo(state.exchangeRateInfo)
+      setOrderInfo(state.orderInfo)
+      setWalletInfo(state.walletInfo)
+      setSettings(state.settings)
+    })
+  }, [props.host])
+
+  const onClose = () => { props.host.closeDialog() }
+
+  if (
+    !settings ||
+    !rateInfo ||
+    !orderInfo ||
+    !walletInfo ||
+    walletInfo.state === 'creating'
+  ) {
+    const loadingText = walletInfo && walletInfo.state === 'creating'
+      ? locale.get('creatingWallet')
+      : ''
+
+    return (
+      <DialogFrame showTitle={true} showBackground={false} onClose={onClose}>
+        <LoadingPanel text={loadingText} />
+      </DialogFrame>
+    )
+  }
+
+  if (!settings.rewardsEnabled) {
+    return (
+      <DialogFrame showTitle={false} showBackground={true} onClose={onClose}>
+        <EnableRewardsPanel onEnableRewards={props.host.enableRewards} />
+      </DialogFrame>
+    )
+  }
 
   const showTitle =
     flowState !== 'payment-complete'
@@ -41,30 +90,6 @@ export function App (props: AppProps) {
   const showBackground =
     flowState !== 'payment-complete' &&
     flowState !== 'payment-processing'
-
-  React.useEffect(() => {
-    props.host.setListener({
-      onWalletUpdated: setWalletInfo,
-      onExchangeRatesUpdated: setRateInfo,
-      onOrderUpdated: setOrderInfo,
-      onRewardsEnabledUpdated: setRewardsEnabled
-    })
-  }, [props.host])
-
-  const onClose = () => { props.host.closeDialog() }
-
-  if (!rateInfo || !walletInfo || !orderInfo) {
-    // TODO(zenparsing): Create a loading screen
-    return (
-      <DialogFrame
-        showTitle={showTitle}
-        showBackground={false}
-        onClose={onClose}
-      >
-        Loading...
-      </DialogFrame>
-    )
-  }
 
   const onShowAddFunds = () => setFlowState('add-funds')
   const onCancelAddFunds = () => setFlowState('start')
@@ -89,14 +114,14 @@ export function App (props: AppProps) {
       {
         flowState === 'start' ?
           <PaymentMethodPanel
-            rewardsEnabled={rewardsEnabled}
+            rewardsEnabled={settings.rewardsEnabled}
             orderDescription={orderInfo.description}
             orderTotal={formatTokenValue(orderInfo.total)}
             orderTotalConverted={formatExchange(orderInfo.total)}
             walletBalance={formatTokenValue(walletInfo.balance)}
             walletBalanceConverted={formatExchange(walletInfo.balance)}
             walletLastUpdated={formatLastUpdatedDate(rateInfo.lastUpdated)}
-            walletVerified={walletInfo.verified}
+            walletVerified={walletInfo.state === 'verified'}
             hasSufficientFunds={amountNeeded <= 0}
             onPayWithCreditCard={props.host.payWithCreditCard}
             onPayWithWallet={props.host.payWithWallet}

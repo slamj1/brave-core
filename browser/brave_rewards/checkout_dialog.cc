@@ -22,7 +22,7 @@ using content::WebUIMessageHandler;
 
 namespace {
 
-constexpr int kDialogMinWidth = 548; // 490;
+constexpr int kDialogMinWidth = 548;
 constexpr int kDialogMinHeight = 200;
 
 constexpr int kDialogMaxWidth = 548;
@@ -32,6 +32,9 @@ class CheckoutDialogDelegate : public ui::WebDialogDelegate {
  public:
   CheckoutDialogDelegate(base::Value params)
       : params_(std::move(params)) {}
+
+  CheckoutDialogDelegate(const CheckoutDialogDelegate&) = delete;
+  CheckoutDialogDelegate& operator=(const CheckoutDialogDelegate&) = delete;
 
   ~CheckoutDialogDelegate() override {}
 
@@ -57,7 +60,7 @@ class CheckoutDialogDelegate : public ui::WebDialogDelegate {
   void GetDialogSize(gfx::Size* size) const override {
     // TODO(zenparsing): Is the constrained modal dialog
     // really what we want? It is designed for interfaces
-    // that are fixed size for a given screen size.
+    // that are fixed size for a given initiator size.
   }
 
   std::string GetDialogArgs() const override {
@@ -81,7 +84,6 @@ class CheckoutDialogDelegate : public ui::WebDialogDelegate {
  private:
   base::Value params_;
 
-  DISALLOW_COPY_AND_ASSIGN(CheckoutDialogDelegate);
 };
 
 }  // namespace

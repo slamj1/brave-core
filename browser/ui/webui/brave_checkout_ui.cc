@@ -25,20 +25,33 @@ using brave_rewards::RewardsService;
 using brave_rewards::RewardsServiceFactory;
 using brave_rewards::RewardsServiceObserver;
 
-class CheckoutMessageHandler : public content::WebUIMessageHandler {
+class CheckoutMessageHandler : public content::WebUIMessageHandler,
+                               public brave_rewards::RewardsServiceObserver {
  public:
   CheckoutMessageHandler();
+
+  CheckoutMessageHandler(const CheckoutMessageHandler&) = delete;
+  CheckoutMessageHandler& operator=(const CheckoutMessageHandler&) = delete;
+
   ~CheckoutMessageHandler() override;
 
+  // WebUIMessageHandler
   void RegisterMessages() override;
+
+  // RewardsServiceObserver
+  void OnWalletInitialized(RewardsService* service, int32_t result) override;
+  void OnRewardsMainEnabled(RewardsService* service, bool enabled) override;
 
  private:
   RewardsService* GetRewardsService();
 
   // Message handlers
   void OnGetWalletBalance(const base::ListValue* args);
+  void OnGetAnonWalletStatus(const base::ListValue* args);
   void OnGetExternalWallet(const base::ListValue* args);
   void OnGetRewardsEnabled(const base::ListValue* args);
+  void OnEnableRewards(const base::ListValue* args);
+  void OnCreateWallet(const base::ListValue* args);
 
   // Rewards service callbacks
   void FetchBalanceCallback(
@@ -49,25 +62,29 @@ class CheckoutMessageHandler : public content::WebUIMessageHandler {
       int32_t status,
       std::unique_ptr<brave_rewards::ExternalWallet> wallet);
 
+  void GetAnonWalletStatusCallback(uint32_t result);
   void GetRewardsMainEnabledCallback(bool enabled);
+  void CreateWalletCallback(int32_t result);
 
   RewardsService* rewards_service_ = nullptr;  // NOT OWNED
   base::WeakPtrFactory<CheckoutMessageHandler> weak_factory_;
-
-  DISALLOW_COPY_AND_ASSIGN(CheckoutMessageHandler);
 };
 
 CheckoutMessageHandler::CheckoutMessageHandler() : weak_factory_(this) {}
 
 CheckoutMessageHandler::~CheckoutMessageHandler() {
-  // TODO(zenparsing): Remove observer
+  if (rewards_service_) {
+    rewards_service_->RemoveObserver(this);
+  }
 }
 
 RewardsService* CheckoutMessageHandler::GetRewardsService() {
   if (!rewards_service_) {
     Profile* profile = Profile::FromWebUI(web_ui());
     rewards_service_ = RewardsServiceFactory::GetForProfile(profile);
-    // TODO(zenparsing): Add observer
+    if (rewards_service_) {
+      rewards_service_->AddObserver(this);
+    }
   }
   return rewards_service_;
 }
@@ -79,6 +96,11 @@ void CheckoutMessageHandler::RegisterMessages() {
                           base::Unretained(this)));
 
   web_ui()->RegisterMessageCallback(
+      "getAnonWalletStatus",
+      base::BindRepeating(&CheckoutMessageHandler::OnGetAnonWalletStatus,
+                          base::Unretained(this)));
+
+  web_ui()->RegisterMessageCallback(
       "getExternalWallet",
       base::BindRepeating(&CheckoutMessageHandler::OnGetExternalWallet,
                           base::Unretained(this)));
@@ -87,6 +109,32 @@ void CheckoutMessageHandler::RegisterMessages() {
       "getRewardsEnabled",
       base::BindRepeating(&CheckoutMessageHandler::OnGetRewardsEnabled,
                           base::Unretained(this)));
+
+  web_ui()->RegisterMessageCallback(
+      "enableRewards",
+      base::BindRepeating(&CheckoutMessageHandler::OnEnableRewards,
+                          base::Unretained(this)));
+
+  web_ui()->RegisterMessageCallback(
+      "createWallet",
+      base::BindRepeating(&CheckoutMessageHandler::OnCreateWallet,
+                          base::Unretained(this)));
+}
+
+void CheckoutMessageHandler::OnWalletInitialized(
+    RewardsService* service,
+    int32_t result) {
+  if (IsJavascriptAllowed()) {
+    base::Value response(base::Value::Type::DICTIONARY);
+    response.SetIntKey("status", result);
+    FireWebUIListener("walletInitialized", std::move(response));
+  }
+}
+
+void CheckoutMessageHandler::OnRewardsMainEnabled(
+    RewardsService* service,
+    bool enabled) {
+  GetRewardsMainEnabledCallback(enabled);
 }
 
 void CheckoutMessageHandler::OnGetWalletBalance(
@@ -95,6 +143,16 @@ void CheckoutMessageHandler::OnGetWalletBalance(
     AllowJavascript();
     service->FetchBalance(base::BindOnce(
         &CheckoutMessageHandler::FetchBalanceCallback,
+        weak_factory_.GetWeakPtr()));
+  }
+}
+
+void CheckoutMessageHandler::OnGetAnonWalletStatus(
+    const base::ListValue* args) {
+  if (auto* service = GetRewardsService()) {
+    AllowJavascript();
+    service->GetAnonWalletStatus(base::BindOnce(
+        &CheckoutMessageHandler::GetAnonWalletStatusCallback,
         weak_factory_.GetWeakPtr()));
   }
 }
@@ -122,6 +180,25 @@ void CheckoutMessageHandler::OnGetRewardsEnabled(
   }
 }
 
+void CheckoutMessageHandler::OnEnableRewards(
+    const base::ListValue* args) {
+  if (auto* service = GetRewardsService()) {
+    AllowJavascript();
+    service->SetRewardsMainEnabled(1);
+  }
+}
+
+void CheckoutMessageHandler::OnCreateWallet(
+    const base::ListValue* args) {
+  if (auto* service = GetRewardsService()) {
+    AllowJavascript();
+    service->CreateWallet(
+        base::Bind(
+            &CheckoutMessageHandler::CreateWalletCallback,
+            weak_factory_.GetWeakPtr()));
+  }
+}
+
 void CheckoutMessageHandler::FetchBalanceCallback(
     int32_t status,
     std::unique_ptr<brave_rewards::Balance> balance) {
@@ -145,6 +222,16 @@ void CheckoutMessageHandler::FetchBalanceCallback(
   }
 
   FireWebUIListener("walletBalanceUpdated", response);
+}
+
+void CheckoutMessageHandler::GetAnonWalletStatusCallback(
+    uint32_t status) {
+  if (!IsJavascriptAllowed())
+    return;
+
+  base::Value response(base::Value::Type::DICTIONARY);
+  response.SetIntKey("status", status);
+  FireWebUIListener("anonWalletStatusUpdated", response);
 }
 
 void CheckoutMessageHandler::GetExternalWalletCallback(
@@ -183,6 +270,11 @@ void CheckoutMessageHandler::GetRewardsMainEnabledCallback(bool enabled) {
   base::Value response(base::Value::Type::DICTIONARY);
   response.SetBoolKey("rewardsEnabled", enabled);
   FireWebUIListener("rewardsEnabledUpdated", response);
+}
+
+void CheckoutMessageHandler::CreateWalletCallback(int32_t result) {
+  // Empty
+  // TODO(zenparsing): Is this handled by WalletInitialized?
 }
 
 

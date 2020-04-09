@@ -18,7 +18,6 @@ import '../../../../ui/webui/resources/fonts/muli.css'
 import '../../../../ui/webui/resources/fonts/poppins.css'
 
 document.addEventListener('DOMContentLoaded', () => {
-  // TODO(zenparsing): Error handling
   const host = createHost()
   const localeData = { get: (key: string) => host.getLocaleString(key) }
 

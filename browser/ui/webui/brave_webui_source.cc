@@ -809,6 +809,12 @@ void CustomizeWebUIHTMLSource(const std::string &name,
         { "notEnoughFunds", IDS_BRAVE_REWARDS_CHECKOUT_NOT_ENOUGH_FUNDS },
         { "useTokenBalance", IDS_BRAVE_REWARDS_CHECKOUT_USE_TOKEN_BALANCE },
         { "updated", IDS_BRAVE_REWARDS_CHECKOUT_UPDATED },
+        { "enableRewardsTitle", IDS_BRAVE_REWARDS_CHECKOUT_ENABLE_REWARDS_TITLE },
+        { "enableRewardsText", IDS_BRAVE_REWARDS_CHECKOUT_ENABLE_REWARDS_TEXT },
+        { "enableRewardsLearnMore", IDS_BRAVE_REWARDS_CHECKOUT_ENABLE_REWARDS_LEARN_MORE },
+        { "enableRewardsButtonText", IDS_BRAVE_REWARDS_CHECKOUT_ENABLE_REWARDS_BUTTON_TEXT },
+        { "enableRewardsTerms", IDS_BRAVE_REWARDS_CHECKOUT_ENABLE_REWARDS_TERMS },
+        { "creatingWallet", IDS_BRAVE_UI_BRAVE_REWARDS_CREATING_TEXT },
       }
     }, {
       std::string("rewards-internals"), {

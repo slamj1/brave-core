@@ -2,94 +2,148 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { OrderInfo, CheckoutHost, CheckoutHostListener } from '../interfaces'
+import { createStateManager } from './stateManager'
+
+import {
+  WalletInfo,
+  WalletState,
+  OrderInfo,
+  Host,
+  HostState
+} from '../interfaces'
 
 function parseDialogArgs (): OrderInfo {
+  // TODO(zenparsing): Error handling?
   const argString = chrome.getVariableValue('dialogArguments')
-
-  let args: any
-  try {
-    args = JSON.parse(argString)
-  } catch {
-    // Ignore
-  }
-
-  const { orderInfo } = Object(args)
-  // TODO(zenparsing): Throw if orderInfo is invalid?
-
+  const { orderInfo } = Object(JSON.parse(argString))
   return {
     description: orderInfo.description,
     total: orderInfo.total
   }
 }
 
-interface BalanceDetails {
-  total: number
-  rates: Record<string, number>
+// User wallet data is collated using data from multiple calls
+// to the rewards service. WalletCollator is used to aggregate
+// this data and provide a WalletInfo object when all data is
+// available.
+function createWalletCollator () {
+  const needed = new Set(['balance', 'verified', 'status'])
+
+  const walletInfo: WalletInfo = {
+    balance: 0,
+    state: 'not-created'
+  }
+
+  function update (key: string, fn: () => void): WalletInfo | undefined {
+    needed.delete(key)
+    fn()
+    return needed.size === 0
+      ? { ...walletInfo }
+      : undefined
+  }
+
+  return {
+
+    setBalance (balance: number) {
+      return update('balance', () => {
+        walletInfo.balance = balance
+      })
+    },
+
+    resetBalance () {
+      needed.add('balance')
+    },
+
+    setVerified (verified: boolean) {
+      return update('verified', () => {
+        if (verified) {
+          walletInfo.state = 'verified'
+        }
+      })
+    },
+
+    setStatus (status: WalletState) {
+      return update('status', () => {
+        walletInfo.state = status
+      })
+    }
+
+  }
 }
 
-interface ExternalWalletDetails {
-  status: number
+function addWebUIListeners (listeners: object) {
+  for (const key of Object.keys(listeners)) {
+    self.cr.addWebUIListener(key, (event: any) => {
+      // TODO(zenparsing): Disable logging in production?
+      console.log(key, event)
+      listeners[key](event)
+    })
+  }
 }
 
-export function createHost (): CheckoutHost {
-  let hostListener: CheckoutHostListener | null = null
-  let balanceDetails: BalanceDetails | null = null
-  let externalWalletDetails: ExternalWalletDetails | null = null
-  let orderInfo = parseDialogArgs()
+export function createHost (): Host {
+  const stateManager = createStateManager<HostState>({
+    orderInfo: parseDialogArgs()
+  })
+
+  const walletCollator = createWalletCollator()
+
+  addWebUIListeners({
+
+    walletBalanceUpdated (event: any) {
+      const { details } = event
+      const total = details ? details.total as number : 0
+      // TODO(zenparsing): This isn't quite right
+      const rates = details ? details.rates as Record<string, number> : {}
+      // TODO(zenparsing): Get from service?
+      const lastUpdated = new Date().toISOString()
+
+      stateManager.update({
+        walletInfo: walletCollator.setBalance(total),
+        exchangeRateInfo: { rates, lastUpdated }
+      })
+    },
+
+    anonWalletStatusUpdated (event: any) {
+      // TODO(zenparsing): Handle "corrupted" (17) differently?
+      // TODO(zenparsing): Using number literals is sad
+      const status = event.status === 12 ? 'created' : 'not-created'
+      stateManager.update({
+        walletInfo: walletCollator.setStatus(status)
+      })
+    },
+
+    externalWalletUpdated (event: any) {
+      if (!event.details) {
+        return
+      }
+      const verified = event.details.status === 1
+      stateManager.update({
+        walletInfo: walletCollator.setVerified(verified)
+      })
+    },
+
+    rewardsEnabledUpdated (event: any) {
+      stateManager.update({
+        settings: { rewardsEnabled: event.rewardsEnabled }
+      })
+    },
+
+    walletInitialized (event: any) {
+      walletCollator.resetBalance()
+      chrome.send('getWalletBalance')
+      chrome.send('getAnonWalletStatus')
+    }
+
+  })
+
+  chrome.send('getRewardsEnabled')
+  chrome.send('getWalletBalance')
+  chrome.send('getAnonWalletStatus')
+  chrome.send('getExternalWallet')
 
   // TODO(zenparsing): Is this required?
   self.i18nTemplate.process(document, self.loadTimeData)
-
-  function sendWalletInfo () {
-    if (hostListener && balanceDetails && externalWalletDetails) {
-      const balance = balanceDetails.total
-      // TODO(zenparsing): Any other status codes?
-      const verified = externalWalletDetails.status === 1
-      hostListener.onWalletUpdated({ balance, verified })
-    }
-  }
-
-  self.cr.addWebUIListener('walletBalanceUpdated', (event: any) => {
-    const { details } = event
-
-    // TODO(zenparsing): Details can be empty if rewards
-    // are not enabled and the user does not have a wallet.
-    // How do we detect this case without ignoring a real
-    // error on startup? If we don't have any details, then
-    // how do we get the rates which are required for
-    // credit card processing?
-    if (!details) {
-      return
-    }
-
-    balanceDetails = details as BalanceDetails
-    sendWalletInfo()
-
-    if (hostListener) {
-      hostListener.onExchangeRatesUpdated({
-        rates: balanceDetails.rates,
-        // TODO(zenparsing): Get from the service
-        lastUpdated: new Date().toISOString()
-      })
-    }
-  })
-
-  self.cr.addWebUIListener('externalWalletUpdated', (event: any) => {
-    const { details } = event
-    if (!details) {
-      return
-    }
-    externalWalletDetails = details as ExternalWalletDetails
-    sendWalletInfo()
-  })
-
-  self.cr.addWebUIListener('rewardsEnabledUpdated', (event: any) => {
-    const { rewardsEnabled } = event
-    if (hostListener) {
-      hostListener.onRewardsEnabledUpdated(rewardsEnabled)
-    }
-  })
 
   return {
 
@@ -99,6 +153,20 @@ export function createHost (): CheckoutHost {
 
     closeDialog () {
       chrome.send('dialogClose')
+    },
+
+    enableRewards () {
+      chrome.send('enableRewards')
+
+      const { walletInfo } = stateManager.state
+      const shouldCreate = walletInfo && walletInfo.state === 'not-created'
+
+      if (shouldCreate) {
+        chrome.send('createWallet')
+        stateManager.update({
+          walletInfo: walletCollator.setStatus('creating')
+        })
+      }
     },
 
     payWithCreditCard (...args) {
@@ -111,24 +179,7 @@ export function createHost (): CheckoutHost {
       // TODO(zenparsing): Send update to service
     },
 
-    setListener (listener) {
-      hostListener = listener
-
-      balanceDetails = null
-      externalWalletDetails = null
-
-      chrome.send('getWalletBalance')
-      chrome.send('getExternalWallet')
-      chrome.send('getRewardsEnabled')
-
-      queueMicrotask(() => {
-        if (hostListener) {
-          hostListener.onOrderUpdated(orderInfo)
-        }
-      })
-
-      return () => { hostListener = null }
-    }
+    addListener: stateManager.addListener
 
   }
 }

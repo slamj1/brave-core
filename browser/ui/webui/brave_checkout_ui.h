@@ -14,10 +14,11 @@
 class BraveCheckoutUI : public ConstrainedWebDialogUI {
  public:
   BraveCheckoutUI(content::WebUI* web_ui, const std::string& host);
-  ~BraveCheckoutUI() override;
 
- private:
-  DISALLOW_COPY_AND_ASSIGN(BraveCheckoutUI);
+  BraveCheckoutUI(const BraveCheckoutUI&) = delete;
+  BraveCheckoutUI& operator=(const BraveCheckoutUI&) = delete;
+
+  ~BraveCheckoutUI() override;
 };
 
 #endif  // BRAVE_BROWSER_UI_WEBUI_BAT_CHECKOUT_UI_H_

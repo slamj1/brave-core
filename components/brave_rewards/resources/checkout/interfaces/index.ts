@@ -2,8 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+export type WalletState =
+  'not-created' |
+  'creating' |
+  'create-failed' |
+  'corrupted' |
+  'created' |
+  'verified'
+
 export interface WalletInfo {
-  verified: boolean
+  state: WalletState
   balance: number
 }
 
@@ -17,17 +25,24 @@ export interface OrderInfo {
   total: number
 }
 
-export interface CheckoutHostListener {
-  onWalletUpdated: (wallet: WalletInfo) => void
-  onExchangeRatesUpdated: (exchangeInfo: ExchangeRateInfo) => void
-  onOrderUpdated: (order: OrderInfo) => void
-  onRewardsEnabledUpdated: (enabled: boolean) => void
+export interface Settings {
+  rewardsEnabled: boolean
 }
 
-export interface CheckoutHost {
+export interface HostState {
+  walletInfo?: WalletInfo
+  exchangeRateInfo?: ExchangeRateInfo
+  orderInfo?: OrderInfo
+  settings?: Settings
+}
+
+export type HostListener = (state: HostState) => void
+
+export interface Host {
   getLocaleString: (key: string) => string
   closeDialog: () => void
   payWithCreditCard: () => void
   payWithWallet: () => void
-  setListener: (listener: CheckoutHostListener) => void
+  enableRewards: () => void
+  addListener: (callback: HostListener) => () => void
 }
