@@ -5,15 +5,21 @@
   */
 package org.chromium.chrome.browser;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.support.v7.app.AlertDialog;
 import java.util.Locale;
 
+import org.chromium.base.ContextUtils;
+import org.chromium.chrome.browser.BraveActivity;
+import org.chromium.chrome.browser.BraveRewardsHelper;
 import org.chromium.chrome.browser.BraveRewardsNativeWorker;
 import org.chromium.chrome.browser.BraveRewardsObserver;
 import org.chromium.chrome.browser.externalnav.BraveExternalNavigationHandler;
 import org.chromium.chrome.browser.externalnav.ExternalNavigationParams;
-
+import org.chromium.chrome.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,15 +30,17 @@ public class BraveUphold implements BraveRewardsObserver {
     public static final String UPHOLD_REDIRECT_URL_KEY = "redirect_url";
     public static final String ACTION_VALUE = "authorization";
     public static final String UPHOLD_SUPPORT_URL = "http://uphold.com/en/brave/support";
+    private static int UNKNOWN_ERROR_CODE = -1;
 
     private ExternalNavigationParams mExternalNavigationParams;
     private BraveExternalNavigationHandler mBraveExternalNavigationHandler;
-    private BraveRewardsNativeWorker rewardsNativeProxy = BraveRewardsNativeWorker.getInstance();
+    private BraveRewardsNativeWorker rewardsNativeProxy;
 
     public void CompleteUpholdVerification(ExternalNavigationParams params,
             BraveExternalNavigationHandler handler) {
         mExternalNavigationParams = params;
         mBraveExternalNavigationHandler = handler;
+        rewardsNativeProxy = BraveRewardsNativeWorker.getInstance();
 
         Uri uri = Uri.parse(params.getUrl());
         rewardsNativeProxy.AddObserver(this);
@@ -40,8 +48,9 @@ public class BraveUphold implements BraveRewardsObserver {
         String query = uri.getQuery();
 
         if (TextUtils.isEmpty(path) || TextUtils.isEmpty(query)) {
-            ReleaseComponents();
-            ShowGenericUpholdverificationError();
+            rewardsNativeProxy.RemoveObserver(this);
+            ReleaseDependencies();
+            ShowErrorMessageBox(UNKNOWN_ERROR_CODE);
             return;
         }
 
@@ -58,25 +67,27 @@ public class BraveUphold implements BraveRewardsObserver {
             String wallet_type, String action,
             String json_args ) {
 
-        String redirect_url = parseJsonArgs (json_args);
-        if (BraveRewardsNativeWorker.LEDGER_OK == error_code) {
-            if (TextUtils.equals(action, ACTION_VALUE) &&
-                    !TextUtils.isEmpty(redirect_url)) {
-                mBraveExternalNavigationHandler.
-                        clobberCurrentTabWithFallbackUrl (redirect_url,
-                        mExternalNavigationParams);
-            }
+        //remove observer
+        if (rewardsNativeProxy != null) {
+            rewardsNativeProxy.RemoveObserver(this);
         }
-        else if (BraveRewardsNativeWorker.BAT_NOT_ALLOWED == error_code) {
-          //open UPHOLD_SUPPORT_URL
-          mBraveExternalNavigationHandler.
-                  clobberCurrentTabWithFallbackUrl (UPHOLD_SUPPORT_URL,
-                  mExternalNavigationParams);
+
+        String redirect_url = parseJsonArgs (json_args);
+        if (BraveRewardsNativeWorker.LEDGER_OK == error_code &&
+                TextUtils.equals(action, ACTION_VALUE)) {
+
+                    //wallet is verified: redirect to chrome://rewards for now
+                    if (TextUtils.isEmpty(redirect_url)) {
+                        redirect_url = BraveActivity.REWARDS_SETTINGS_URL;
+                    }
+                    mBraveExternalNavigationHandler.
+                            clobberCurrentTabWithFallbackUrl (redirect_url,
+                            mExternalNavigationParams);
+                ReleaseDependencies();
         }
         else {
-          ShowGenericUpholdverificationError();
+            ShowErrorMessageBox(error_code);
         }
-        ReleaseComponents();
     }
 
     private String parseJsonArgs(String json_args) {
@@ -91,17 +102,39 @@ public class BraveUphold implements BraveRewardsObserver {
         return redirect_url;
     }
 
-    private void ReleaseComponents() {
-        //remove observer
-        if (rewardsNativeProxy != null) {
-            rewardsNativeProxy.RemoveObserver(this);
-        }
-
+    private void ReleaseDependencies() {
         mExternalNavigationParams = null;
         mBraveExternalNavigationHandler = null;
     }
 
-    private void ShowGenericUpholdverificationError () {
+    private void ShowErrorMessageBox (int error_code) {
+        String msg = "";
+        String msg_title = "";
+        Context context = ContextUtils.getApplicationContext();
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                BraveRewardsHelper.getChromeTabbedActivity(),
+                R.style.Theme_Chromium_AlertDialog);
 
+        if (BraveRewardsNativeWorker.BAT_NOT_ALLOWED == error_code) {
+            msg = context.getResources().getString(R.string.bat_not_allowed_in_region);
+            msg_title = context.getResources().getString(R.string.bat_not_allowed_in_region_title);
+        }
+        else {
+            msg = context.getResources().getString(R.string.wallet_verification_generic_error);
+            msg_title = context.getResources().getString(R.string.wallet_verification_generic_error_title);
+        }
+        builder.setMessage(msg)
+                .setTitle (msg_title)
+                .setPositiveButton(R.string.ok, (DialogInterface dialog, int which)-> {
+                        mBraveExternalNavigationHandler.
+                            clobberCurrentTabWithFallbackUrl (UPHOLD_SUPPORT_URL,
+                            mExternalNavigationParams);
+                })
+                .setOnDismissListener((DialogInterface dialog)-> {
+                    ReleaseDependencies();
+                });
+
+        AlertDialog dlg = builder.create();
+        dlg.show();
     }
 }

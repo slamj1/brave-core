@@ -593,7 +593,7 @@ month...
         The Brave Rewards server is not responding. We will fix this as soon as possible.
       </message>
       <message name="IDS_BRAVE_UI_ERROR_INIT_WALLET" desc="An error which appear on wallet creation with no connection to the rewards service">
-        Please try again later.
+        Please try again later
       </message>
       <message name="IDS_BRAVE_UI_EXPIRES_ON" desc="A message about grants expiration date">
         expires on <ph name="DATE">%1$s<ex>4/14/2019</ex></ph>
@@ -1001,6 +1001,18 @@ until they verify, or until 90 days have passed.
       </message>
       <message name="IDS_USER_WALLET_STATUS_PENDING">
         Pending
+      </message>
+      <message name="IDS_BAT_NOT_ALLOWED_IN_REGION">
+        BAT is not currently supported in your region based on the location your account is opened. Check back later for availability.
+      </message>
+      <message name="IDS_BAT_NOT_ALLOWED_IN_REGION_TITLE">
+        Region not supported
+      </message>
+      <message name="IDS_WALLET_VERIFICATION_GENERIC_ERROR">
+        There was a problem verifying your wallet, please try again later.
+      </message>
+      <message name="IDS_WALLET_VERIFICATION_GENERIC_ERROR_TITLE">
+        Wallet verification error
       </message>
     </messages>
   </release>
