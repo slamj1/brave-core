@@ -27,15 +27,3 @@ const TemplateURLService*
 BraveAutocompleteProviderClient::GetTemplateURLService() const {
   return TemplateURLServiceFactory::GetForProfile(profile_);
 }
-
-std::vector<base::string16> BraveAutocompleteProviderClient::GetBuiltinURLs() {
-  std::vector<base::string16> v =
-      ChromeAutocompleteProviderClient::GetBuiltinURLs();
-  auto it = std::find(v.begin(), v.end(),
-      base::ASCIIToUTF16(chrome::kChromeUISyncInternalsHost));
-  DCHECK(it != v.end());
-  if (it != v.end()) {
-    *it = base::ASCIIToUTF16(kBraveUISyncHost);
-  }
-  return v;
-}
