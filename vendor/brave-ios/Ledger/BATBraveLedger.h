@@ -70,8 +70,6 @@ NS_SWIFT_NAME(BraveLedger)
 @property (nonatomic, class, getter=isDebug) BOOL debug;
 /// The environment that ledger is communicating with
 @property (nonatomic, class) BATEnvironment environment;
-/// Marks if this is being ran in a test environment. Defaults to false
-@property (nonatomic, class, getter=isTesting) BOOL testing;
 /// Number of minutes between reconciles override. Defaults to 0 (no override)
 @property (nonatomic, class) int reconcileTime;
 /// Whether or not to use short contribution retries. Defaults to false

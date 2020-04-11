@@ -112,8 +112,6 @@ class AdsClientMojoBridge
       const std::string& content_type,
       const int32_t method,
       URLRequestCallback callback) override;
-  void LoadSampleBundle(
-      LoadSampleBundleCallback callback) override;
   void ShowNotification(
       const std::string& notification_info) override;
   void CloseNotification(
@@ -181,10 +179,6 @@ class AdsClientMojoBridge
       const int response_status_code,
       const std::string& content,
       const std::map<std::string, std::string>& headers);
-  static void OnLoadSampleBundle(
-      CallbackHolder<LoadSampleBundleCallback>* holder,
-      const ads::Result result,
-      const std::string& value);
   static void OnSaveBundleState(
       CallbackHolder<SaveBundleStateCallback>* holder,
       const ads::Result result);

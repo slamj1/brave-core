@@ -364,7 +364,6 @@ typedef NS_ENUM(NSInteger, BATLedgerDatabaseMigrationType) {
 #pragma mark - Global
 
 BATClassLedgerBridge(BOOL, isDebug, setDebug, is_debug)
-BATClassLedgerBridge(BOOL, isTesting, setTesting, is_testing)
 BATClassLedgerBridge(int, reconcileTime, setReconcileTime, reconcile_time)
 BATClassLedgerBridge(BOOL, useShortRetries, setUseShortRetries, short_retries)
 

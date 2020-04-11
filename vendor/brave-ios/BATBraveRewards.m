@@ -33,7 +33,6 @@
 {
   __auto_type config = [self defaultConfiguration];
   config.stateStoragePath = NSTemporaryDirectory();
-  config.testing = YES;
   config.useShortRetries = YES;
   config.overridenNumberOfSecondsBetweenReconcile = 30;
   return config;
@@ -44,7 +43,6 @@
   __auto_type config = [[BATBraveRewardsConfiguration alloc] init];
   config.stateStoragePath = self.stateStoragePath;
   config.environment = self.environment;
-  config.testing = self.testing;
   config.useShortRetries = self.useShortRetries;
   config.overridenNumberOfSecondsBetweenReconcile = self.overridenNumberOfSecondsBetweenReconcile;
   return config;
@@ -92,11 +90,9 @@
 
     BATBraveAds.debug = configuration.environment != BATEnvironmentProduction;
     BATBraveAds.environment = configuration.environment;
-    BATBraveAds.testing = configuration.testing;
 
     BATBraveLedger.debug = configuration.environment != BATEnvironmentProduction;
     BATBraveLedger.environment = configuration.environment;
-    BATBraveLedger.testing = configuration.testing;
     BATBraveLedger.useShortRetries = configuration.useShortRetries;
     BATBraveLedger.reconcileTime = configuration.overridenNumberOfSecondsBetweenReconcile;
     

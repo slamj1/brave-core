@@ -79,10 +79,6 @@ void BatAdsImpl::OnPageLoaded(
   ads_->OnPageLoaded(url, content);
 }
 
-void BatAdsImpl::ServeSampleAd() {
-  ads_->ServeSampleAd();
-}
-
 void BatAdsImpl::OnTimer(const uint32_t timer_id) {
   ads_->OnTimer(timer_id);
 }

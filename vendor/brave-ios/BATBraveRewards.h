@@ -13,8 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 NS_SWIFT_NAME(BraveRewardsConfiguration)
 @interface BATBraveRewardsConfiguration : NSObject <NSCopying>
 
-/// Whether or not rewards is being tested
-@property (nonatomic, getter=isTesting) BOOL testing;
 //@property (nonatomic, getter=isDebug) BOOL debug;
 /// The rewards environment
 @property (nonatomic) BATEnvironment environment;
@@ -38,7 +36,7 @@ NS_SWIFT_NAME(BraveRewardsConfiguration)
 ///
 /// State is stored in Application Support
 @property (nonatomic, class, readonly) BATBraveRewardsConfiguration *productionConfiguration NS_SWIFT_NAME(production);
-/// The testing configuration. Environment is development & is_testing is set to true. Short retries are enabled,
+/// The testing configuration. Environment is development. Short retries are enabled,
 /// number of seconds between reconciles is set to 30 seconds instead of 30 days.
 ///
 /// State is saved to a directory created in /tmp

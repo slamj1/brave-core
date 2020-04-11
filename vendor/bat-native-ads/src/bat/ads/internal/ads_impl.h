@@ -183,14 +183,6 @@ class AdsImpl : public Ads {
       const std::vector<double>& page_score);
   const std::map<std::string, std::vector<double>>& GetPageScoreCache() const;
 
-  void ServeSampleAd() override;
-  void OnLoadSampleBundle(
-      const Result result,
-      const std::string& json);
-
-  void CheckEasterEgg(
-      const std::string& url);
-
   void MaybeServeAdNotification(
       const bool should_serve);
   void ServeAdNotificationIfReady(
@@ -270,9 +262,6 @@ class AdsImpl : public Ads {
   void AppendAdNotificationToHistory(
       const AdNotificationInfo& info,
       const ConfirmationType& confirmation_type);
-
-  bool IsCreativeSetFromSampleCatalog(
-      const std::string& creative_set_id) const;
 
   bool IsSupportedUrl(
       const std::string& url) const;

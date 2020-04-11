@@ -179,8 +179,6 @@ class AdsServiceImpl : public AdsService,
 
   void UpdateIsDebugFlag();
   bool IsDebug() const;
-  void UpdateIsTestingFlag();
-  bool IsTesting() const;
 
   void StartCheckIdleStateTimer();
   void CheckIdleState();
@@ -425,9 +423,6 @@ class AdsServiceImpl : public AdsService,
 
   std::string LoadJsonSchema(
       const std::string& name) override;
-
-  void LoadSampleBundle(
-      ads::LoadSampleBundleCallback callback) override;
 
   void SaveBundleState(
       std::unique_ptr<ads::BundleState> bundle_state,

@@ -48,8 +48,6 @@ class BatAdsImpl :
       const std::string& url,
       const std::string& html) override;
 
-  void ServeSampleAd() override;
-
   void OnTimer(
       const uint32_t timer_id) override;
 

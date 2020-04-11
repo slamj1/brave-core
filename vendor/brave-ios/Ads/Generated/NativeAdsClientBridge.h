@@ -29,7 +29,6 @@
 - (void)killTimer:(uint32_t)timer_id;
 - (void)load:(const std::string &)name callback:(ads::LoadCallback)callback;
 - (std::string)loadJsonSchema:(const std::string &)name;
-- (void)loadSampleBundle:(ads::LoadSampleBundleCallback)callback;
 - (void)loadUserModelForLanguage:(const std::string &)language callback:(ads::LoadCallback)callback;
 - (std::unique_ptr<ads::LogStream>)log:(const char *)file line:(const int)line logLevel:(const ads::LogLevel)log_level;
 - (void)reset:(const std::string &)name callback:(ads::ResultCallback)callback;
