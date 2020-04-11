@@ -48,8 +48,8 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.Locale;
 
-public class BraveRewardsSiteBannerActivity extends Activity implements BraveRewardsHelper.LargeIconReadyCallback, BraveRewardsObserver {
-
+public class BraveRewardsSiteBannerActivity extends Activity implements
+        BraveRewardsHelper.LargeIconReadyCallback, BraveRewardsObserver {
     private  ToggleButton radio_tip_amount[] = new ToggleButton [3];
     private final int TIP_SENT_REQUEST_CODE = 2;
     private final int FADE_OUT_DURATION = 500;
@@ -280,34 +280,36 @@ public class BraveRewardsSiteBannerActivity extends Activity implements BraveRew
         if (!verified) {
             findViewById(R.id.not_verified_warning_layout ).setVisibility(View.VISIBLE);
 
-            part1 = getResources().getString(R.string.brave_ui_site_banner_notice_text);
-            part2 = getResources().getString(R.string.learn_more);
+            final String note_part1 = getResources().getString(R.string.brave_ui_site_banner_notice_text);
+            final String note_part2 = getResources().getString(R.string.learn_more);
 
             final StringBuilder sb1 = new StringBuilder();
-            sb1.append(part1);
+            sb1.append(note_part1);
             sb1.append(" <br><font color=#00afff>");
-            sb1.append(part2);
+            sb1.append(note_part2);
             sb1.append("</font></br>");
             toInsert = BraveRewardsHelper.spannedFromHtmlString(sb1.toString());
             TextView not_verified_warning_text = (TextView )findViewById(R.id.not_verified_warning_text );
             not_verified_warning_text.setText(toInsert);
+            String full_note_str = toInsert.toString();
 
             not_verified_warning_text.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
+                    boolean event_consumed = false;
                     if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                         int offset = not_verified_warning_text.getOffsetForPosition(
                                 motionEvent.getX(), motionEvent.getY());
 
-                        String learn_more = getResources().getString(R.string.learn_more);
-                        if (BraveRewardsHelper.subtextAtOffset(not_verified_warning_text.getText().toString(), learn_more, offset) ){
-                            Intent returnIntent = new Intent();
-                            // TODO
-                            // setResult(ChromeTabbedActivity.SITE_BANNER_NOT_VERIFIED_LEARN_MORE_RESULT_CODE, returnIntent);
+                        if (BraveRewardsHelper.subtextAtOffset(full_note_str, note_part2, offset) ){
+                            event_consumed = true;
+                            Intent intent = new Intent();
+                            intent.putExtra(BraveActivity.OPEN_URL, BraveActivity.REWARDS_LEARN_MORE_URL);
+                            setResult(RESULT_OK, intent);
                             finish();
                         }
                     }
-                    return false;
+                    return event_consumed;
                 }
             });
         } else {
@@ -410,8 +412,6 @@ public class BraveRewardsSiteBannerActivity extends Activity implements BraveRew
         SetFavIcon(icon);
     }
 
-
-
     //`make_monthly_checkbox` checkbox click handler
     public void onMonthlyCheckboxClicked(View view) {
         boolean checked = ((CheckBox) view).isChecked();
@@ -443,12 +443,6 @@ public class BraveRewardsSiteBannerActivity extends Activity implements BraveRew
         onMonthlyCheckboxClicked(cb);
     }
 
-
-
-    // BraveRewardsObserver/////////////////////////////////////
-    @Override
-    public void OnWalletInitialized(int error_code){}
-
     @Override
     public void OnWalletProperties(int error_code){
         if (error_code == 0) {
@@ -462,49 +456,4 @@ public class BraveRewardsSiteBannerActivity extends Activity implements BraveRew
             }
         }
     }
-
-    @Override
-    public void OnPublisherInfo(int tabId){}
-
-    @Override
-    public void OnGetCurrentBalanceReport(double[] report){}
-
-    @Override
-    public void OnNotificationAdded(String id, int type, long timestamp, String[] args) {}
-
-    @Override
-    public void OnNotificationsCount(int count) {}
-
-    @Override
-    public void OnGetLatestNotification(String id, int type, long timestamp, String[] args) {}
-
-    @Override
-    public void OnNotificationDeleted(String id) {}
-
-    @Override
-    public void OnIsWalletCreated(boolean created) {}
-
-    @Override
-    public void OnGetPendingContributionsTotal(double amount) {}
-
-    @Override
-    public void OnGetRewardsMainEnabled(boolean enabled) {}
-
-    @Override
-    public void OnGetAutoContributeProps() {}
-
-    @Override
-    public void OnGetReconcileStamp(long timestamp) {}
-
-    @Override
-    public void OnRecurringDonationUpdated() {}
-
-    @Override
-    public void OnResetTheWholeState(boolean success) {}
-
-    @Override
-    public void OnRewardsMainEnabled(boolean enabled) {}
-
-    @Override
-    public void OnFetchPromotions() {}
 }

@@ -30,6 +30,8 @@ public class BraveUphold implements BraveRewardsObserver {
     public static final String UPHOLD_REDIRECT_URL_KEY = "redirect_url";
     public static final String ACTION_VALUE = "authorization";
     public static final String UPHOLD_SUPPORT_URL = "http://uphold.com/en/brave/support";
+    public static final String UPHOLD_ORIGIN_URL = "http://uphold.com";
+
     private static int UNKNOWN_ERROR_CODE = -1;
 
     private ExternalNavigationParams mExternalNavigationParams;
