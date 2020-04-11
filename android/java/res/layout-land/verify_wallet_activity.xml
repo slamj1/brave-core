@@ -10,25 +10,13 @@
     android:paddingTop="20dp"
     android:paddingBottom="10dp">
 
-    <TextView
-        android:id="@+id/br_notification_close"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text=""
-        android:layout_gravity="top|end"
-        android:gravity="center"
-        android:focusable="true"
-        android:clickable="true"
-        android:alpha=".5"
-        android:drawableEnd="@drawable/bat_unverified"
-        android:padding="5dp"/>
-
     <!--header-->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/verify_wallet_margin1_land">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -54,16 +42,6 @@
                 android:layout_gravity="center_vertical"
                 android:textColor="@android:color/white"
                 android:gravity="center_vertical"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/verify_wallet_note"
-                android:textSize="@dimen/verify_wallet_header4_font_size_land"
-                android:layout_gravity="center"
-                android:textAlignment="center"
-                android:textColor="#e6e3f4"
-                android:layout_marginTop="4dp"/>
         </LinearLayout>
     </LinearLayout>
 

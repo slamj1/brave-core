@@ -937,13 +937,10 @@ until they verify, or until 90 days have passed.
         Wallet Verified
       </message>
       <message name="IDS_VERIFY_WALLET_HEADER">
-        Ready to verify your Wallet\?
+        Verifying your wallet is optional
       </message>
       <message name="IDS_VERIFY_WALLET_HEADER1">
-        Benefits of verifying
-      </message>
-      <message name="IDS_VERIFY_WALLET_NOTE">
-        Verification is not necessary to earn rewards for creator conbtributions
+        But if you verify, you can...
       </message>
       <message name="IDS_VERIFY_WALLET_BENEFITS1">
         Withdraw BAT that you earn from viewing privacy-respecting ads
