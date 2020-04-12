@@ -294,8 +294,6 @@ AdsServiceImpl::AdsServiceImpl(Profile* profile) :
            base::TaskPriority::BEST_EFFORT,
             base::TaskShutdownBehavior::BLOCK_SHUTDOWN})),
     base_path_(profile_->GetPath().AppendASCII("ads_service")),
-    next_timer_id_(0),
-    remove_onboarding_timer_id_(0),
     last_idle_state_(ui::IdleState::IDLE_STATE_ACTIVE),
     bundle_state_backend_(new BundleStateDatabase(
         base_path_.AppendASCII("bundle_state"))),
@@ -811,6 +809,14 @@ void AdsServiceImpl::OnClose(
     const std::string& uuid,
     const bool by_user,
     base::OnceClosure completed_closure) {
+  if (StopNotificationTimeoutTimer(uuid)) {
+    if (by_user) {
+      LOG(INFO) << "Cancelled timeout for ad notification with uuid " << uuid;
+    } else {
+      LOG(INFO) << "Timed out ad notification with uuid " << uuid;
+    }
+  }
+
   if (connected()) {
     const ads::AdNotificationEventType event_type =
         by_user ? ads::AdNotificationEventType::kDismissed :
@@ -836,6 +842,10 @@ void AdsServiceImpl::MaybeViewAdNotification() {
 
 void AdsServiceImpl::ViewAdNotification(
     const std::string& uuid) {
+  if (StopNotificationTimeoutTimer(uuid)) {
+    LOG(INFO) << "Cancelled timeout for ad notification with uuid " << uuid;
+  }
+
   if (!connected() || !is_initialized_) {
     RetryViewingAdNotification(uuid);
     return;
@@ -910,10 +920,7 @@ void AdsServiceImpl::OpenNewTabWithUrl(
 }
 
 void AdsServiceImpl::NotificationTimedOut(
-    const uint32_t timer_id,
     const std::string& uuid) {
-  timers_.erase(timer_id);
-
   if (!connected()) {
     return;
   }
@@ -1144,17 +1151,6 @@ void AdsServiceImpl::OnReset(
   }
 
   callback(success ? ads::Result::SUCCESS : ads::Result::FAILED);
-}
-
-void AdsServiceImpl::OnTimer(
-    const uint32_t timer_id) {
-  timers_.erase(timer_id);
-
-  if (!connected()) {
-    return;
-  }
-
-  bat_ads_->OnTimer(timer_id);
 }
 
 void AdsServiceImpl::MigratePrefs() {
@@ -1583,7 +1579,7 @@ void AdsServiceImpl::RemoveOnboarding() {
     return;
   }
 
-  KillTimer(remove_onboarding_timer_id_);
+  onboarding_timer_.Stop();
 
   auto* notification_service = rewards_service_->GetNotificationService();
   notification_service->DeleteNotification(kRewardsNotificationAdsOnboarding);
@@ -1605,7 +1601,7 @@ bool AdsServiceImpl::ShouldRemoveOnboarding() const {
 }
 
 void AdsServiceImpl::StartRemoveOnboardingTimer() {
-  if (remove_onboarding_timer_id_ != 0) {
+  if (onboarding_timer_.IsRunning()) {
     return;
   }
 
@@ -1628,24 +1624,14 @@ void AdsServiceImpl::StartRemoveOnboardingTimer() {
     timer_offset_in_seconds = timestamp_in_seconds - now_in_seconds;
   }
 
-  remove_onboarding_timer_id_ = next_timer_id();
-
-  timers_[remove_onboarding_timer_id_] = std::make_unique<base::OneShotTimer>();
-  timers_[remove_onboarding_timer_id_]->Start(FROM_HERE,
+  onboarding_timer_.Start(FROM_HERE,
       base::TimeDelta::FromSeconds(timer_offset_in_seconds),
-      base::BindOnce(&AdsServiceImpl::OnRemoveOnboarding, AsWeakPtr(),
-          remove_onboarding_timer_id_));
+          base::BindOnce(&AdsServiceImpl::RemoveOnboarding, AsWeakPtr()));
 
   auto time = base::TimeFormatFriendlyDateAndTime(
       base::Time::FromDoubleT(timestamp_in_seconds));
 
   LOG(INFO) << "Start timer to remove onboarding on " << time;
-}
-
-void AdsServiceImpl::OnRemoveOnboarding(
-    const uint32_t timer_id) {
-  timers_.erase(timer_id);
-  RemoveOnboarding();
 }
 
 void AdsServiceImpl::MaybeShowMyFirstAdNotification() {
@@ -1850,16 +1836,6 @@ void AdsServiceImpl::OnPrefsChanged(
   }
 }
 
-uint32_t AdsServiceImpl::next_timer_id() {
-  if (next_timer_id_ == std::numeric_limits<uint32_t>::max()) {
-    next_timer_id_ = 1;
-  } else {
-    ++next_timer_id_;
-  }
-
-  return next_timer_id_;
-}
-
 bool AdsServiceImpl::connected() {
   return bat_ads_.is_bound();
 }
@@ -1943,15 +1919,38 @@ void AdsServiceImpl::ShowNotification(
   display_service_->Display(NotificationHandler::Type::BRAVE_ADS,
       *notification, /*metadata=*/nullptr);
 
-#if !defined(OS_ANDROID)
-  uint32_t timer_id = next_timer_id();
+  StartNotificationTimeoutTimer(info->uuid);
+}
 
-  timers_[timer_id] = std::make_unique<base::OneShotTimer>();
-  timers_[timer_id]->Start(FROM_HERE,
-      base::TimeDelta::FromSeconds(120),
-      base::BindOnce(&AdsServiceImpl::NotificationTimedOut, AsWeakPtr(),
-          timer_id, info->uuid));
+void AdsServiceImpl::StartNotificationTimeoutTimer(
+    const std::string& uuid) {
+#if !defined(OS_ANDROID)
+  const uint64_t timeout_in_seconds = 120;
+
+  notification_timers_[uuid] = std::make_unique<base::OneShotTimer>();
+
+  const base::TimeDelta timeout =
+      base::TimeDelta::FromSeconds(timeout_in_seconds);
+
+  notification_timers_[uuid]->Start(FROM_HERE, timeout,
+      base::BindOnce(&AdsServiceImpl::NotificationTimedOut, AsWeakPtr(), uuid));
+
+  LOG(INFO) << "Timeout ad notification with uuid " << uuid << " in "
+      << timeout_in_seconds << " seconds";
 #endif
+}
+
+bool AdsServiceImpl::StopNotificationTimeoutTimer(
+    const std::string& uuid) {
+  const auto iter = notification_timers_.find(uuid);
+  if (iter == notification_timers_.end()) {
+    LOG(WARNING) << "Failed to timeout ad notification with uuid " << uuid;
+    return false;
+  }
+
+  notification_timers_.erase(iter);
+
+  return true;
 }
 
 bool AdsServiceImpl::ShouldShowNotifications() {
@@ -1987,28 +1986,6 @@ void AdsServiceImpl::ConfirmAction(
     const ads::ConfirmationType confirmation_type) {
   rewards_service_->ConfirmAction(creative_instance_id, creative_set_id,
       confirmation_type);
-}
-
-uint32_t AdsServiceImpl::SetTimer(
-    const uint64_t time_offset) {
-  uint32_t timer_id = next_timer_id();
-
-  timers_[timer_id] = std::make_unique<base::OneShotTimer>();
-  timers_[timer_id]->Start(FROM_HERE,
-      base::TimeDelta::FromSeconds(time_offset),
-      base::BindOnce(&AdsServiceImpl::OnTimer, AsWeakPtr(), timer_id));
-
-  return timer_id;
-}
-
-void AdsServiceImpl::KillTimer(
-    const uint32_t timer_id) {
-  if (timers_.find(timer_id) == timers_.end()) {
-    return;
-  }
-
-  timers_[timer_id]->Stop();
-  timers_.erase(timer_id);
 }
 
 void AdsServiceImpl::URLRequest(

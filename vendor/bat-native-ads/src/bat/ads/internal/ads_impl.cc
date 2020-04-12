@@ -407,6 +407,9 @@ void AdsImpl::OnAdNotificationEvent(
 
   AdNotificationInfo info;
   if (!ad_notifications_->Get(uuid, &info)) {
+    BLOG(ERROR) << "Failed to trigger ad event as ad notification was not "
+        "found for uuid " << uuid;
+
     return;
   }
 
@@ -1606,12 +1609,6 @@ void AdsImpl::ConfirmAction(
 
   ads_client_->ConfirmAction(creative_instance_id, creative_set_id,
       confirmation_type);
-}
-
-void AdsImpl::OnTimer(
-    const uint32_t timer_id) {
-  BLOG(INFO) << "OnTimer: " << std::endl
-      << "  timer_id: " << timer_id;
 }
 
 void AdsImpl::AppendAdNotificationToHistory(
