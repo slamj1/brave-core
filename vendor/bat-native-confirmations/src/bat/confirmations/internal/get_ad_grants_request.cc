@@ -15,16 +15,14 @@ GetAdGrantsRequest::GetAdGrantsRequest() = default;
 
 GetAdGrantsRequest::~GetAdGrantsRequest() = default;
 
-// GET /v2/wallet/{payment_id}/grants/ads
+// GET GET /v1/promotions/ads/grants/summary?paymentId={payment_id}
 
 std::string GetAdGrantsRequest::BuildUrl(
     const WalletInfo& wallet_info) const {
   DCHECK(!wallet_info.payment_id.empty());
 
-  std::string endpoint = "/v2/wallet/";
+  std::string endpoint = "/v1/promotions/ads/grants/summary?paymentId=";
   endpoint += wallet_info.payment_id;
-  endpoint += "/grants";
-  endpoint += "/ads";
 
   return helper::LedgerServe::GetURL().append(endpoint);
 }
