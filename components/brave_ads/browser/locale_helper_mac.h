@@ -24,7 +24,11 @@ class LocaleHelperMac : public LocaleHelper {
   std::string GetLocale() const override;
 
   friend struct base::DefaultSingletonTraits<LocaleHelperMac>;
-  DISALLOW_COPY_AND_ASSIGN(LocaleHelperMac);
+
+  LocaleHelperMac(
+      const LocaleHelperMac&) = delete;
+  LocaleHelperMac& operator=(
+      const LocaleHelperMac&) = delete;
 };
 
 }  // namespace brave_ads

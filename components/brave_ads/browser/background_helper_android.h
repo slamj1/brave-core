@@ -37,7 +37,11 @@ class BackgroundHelperAndroid :
   bool IsForeground() const override;
 
   friend struct base::DefaultSingletonTraits<BackgroundHelperAndroid>;
-  DISALLOW_COPY_AND_ASSIGN(BackgroundHelperAndroid);
+
+  BackgroundHelperAndroid(
+      const BackgroundHelperAndroid&) = delete;
+  BackgroundHelperAndroid& operator=(
+      const BackgroundHelperAndroid&) = delete;
 };
 
 }  // namespace brave_ads

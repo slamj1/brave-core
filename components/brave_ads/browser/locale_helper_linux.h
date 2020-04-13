@@ -24,7 +24,11 @@ class LocaleHelperLinux : public LocaleHelper {
   std::string GetLocale() const override;
 
   friend struct base::DefaultSingletonTraits<LocaleHelperLinux>;
-  DISALLOW_COPY_AND_ASSIGN(LocaleHelperLinux);
+
+  LocaleHelperLinux(
+      const LocaleHelperLinux&) = delete;
+  LocaleHelperLinux& operator=(
+      const LocaleHelperLinux&) = delete;
 };
 
 }  // namespace brave_ads

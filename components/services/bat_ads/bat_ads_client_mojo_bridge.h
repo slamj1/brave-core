@@ -122,7 +122,10 @@ class BatAdsClientMojoBridge
 
   mojo::AssociatedRemote<mojom::BatAdsClient> bat_ads_client_;
 
-  DISALLOW_COPY_AND_ASSIGN(BatAdsClientMojoBridge);
+  BatAdsClientMojoBridge(
+      const BatAdsClientMojoBridge&) = delete;
+  BatAdsClientMojoBridge& operator=(
+      const BatAdsClientMojoBridge&) = delete;
 };
 
 }  // namespace bat_ads

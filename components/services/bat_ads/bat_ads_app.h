@@ -39,7 +39,10 @@ class BatAdsApp : public service_manager::Service {
       service_manager::ServiceKeepalive* keepalive,
       mojo::PendingReceiver<mojom::BatAdsService> receiver);
 
-  DISALLOW_COPY_AND_ASSIGN(BatAdsApp);
+  BatAdsApp(
+      const BatAdsApp&) = delete;
+  BatAdsApp& operator=(
+      const BatAdsApp&) = delete;
 };
 
 }  // namespace bat_ads

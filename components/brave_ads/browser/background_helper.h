@@ -41,7 +41,11 @@ class BackgroundHelper {
   base::ObserverList<Observer>::Unchecked observers_;
 
   friend struct base::DefaultSingletonTraits<BackgroundHelper>;
-  DISALLOW_COPY_AND_ASSIGN(BackgroundHelper);
+
+  BackgroundHelper(
+      const BackgroundHelper&) = delete;
+  BackgroundHelper& operator=(
+      const BackgroundHelper&) = delete;
 };
 
 }  // namespace brave_ads

@@ -49,7 +49,10 @@ class BatAdsServiceImpl : public mojom::BatAdsService {
   bool is_initialized_;
   mojo::UniqueAssociatedReceiverSet<mojom::BatAds> receivers_;
 
-  DISALLOW_COPY_AND_ASSIGN(BatAdsServiceImpl);
+  BatAdsServiceImpl(
+      const BatAdsServiceImpl&) = delete;
+  BatAdsServiceImpl& operator=(
+      const BatAdsServiceImpl&) = delete;
 };
 
 }  // namespace bat_ads

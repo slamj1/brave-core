@@ -22,7 +22,10 @@ class NotificationHelperMock : public NotificationHelper {
   MOCK_CONST_METHOD0(CanShowBackgroundNotifications, bool());
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(NotificationHelperMock);
+  NotificationHelperMock(
+      const NotificationHelperMock&) = delete;
+  NotificationHelperMock& operator=(
+      const NotificationHelperMock&) = delete;
 };
 
 }  // namespace brave_ads

@@ -25,7 +25,11 @@ class LocaleHelperWin : public LocaleHelper {
   std::string GetLocale() const override;
 
   friend struct base::DefaultSingletonTraits<LocaleHelperWin>;
-  DISALLOW_COPY_AND_ASSIGN(LocaleHelperWin);
+
+  LocaleHelperWin(
+      const LocaleHelperWin&) = delete;
+  LocaleHelperWin& operator=(
+      const LocaleHelperWin&) = delete;
 };
 
 }  // namespace brave_ads

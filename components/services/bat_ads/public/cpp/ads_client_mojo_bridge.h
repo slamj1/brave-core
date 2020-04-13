@@ -200,7 +200,10 @@ class AdsClientMojoBridge
 
   ads::AdsClient* ads_client_;  // NOT OWNED
 
-  DISALLOW_COPY_AND_ASSIGN(AdsClientMojoBridge);
+  AdsClientMojoBridge(
+      const AdsClientMojoBridge&) = delete;
+  AdsClientMojoBridge& operator=(
+      const AdsClientMojoBridge&) = delete;
 };
 
 }  // namespace bat_ads

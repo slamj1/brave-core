@@ -33,7 +33,11 @@ class NotificationHelperMac
   bool CanShowBackgroundNotifications() const override;
 
   friend struct base::DefaultSingletonTraits<NotificationHelperMac>;
-  DISALLOW_COPY_AND_ASSIGN(NotificationHelperMac);
+
+  NotificationHelperMac(
+      const NotificationHelperMac&) = delete;
+  NotificationHelperMac& operator=(
+      const NotificationHelperMac&) = delete;
 };
 
 }  // namespace brave_ads

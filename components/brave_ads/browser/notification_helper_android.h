@@ -38,7 +38,11 @@ class NotificationHelperAndroid
   bool CanShowBackgroundNotifications() const override;
 
   friend struct base::DefaultSingletonTraits<NotificationHelperAndroid>;
-  DISALLOW_COPY_AND_ASSIGN(NotificationHelperAndroid);
+
+  NotificationHelperAndroid(
+      const NotificationHelperAndroid&) = delete;
+  NotificationHelperAndroid& operator=(
+      const NotificationHelperAndroid&) = delete;
 };
 
 }  // namespace brave_ads

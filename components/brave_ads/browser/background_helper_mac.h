@@ -30,7 +30,11 @@ class BackgroundHelperMac : public BackgroundHelper {
   bool IsForeground() const override;
 
   friend struct base::DefaultSingletonTraits<BackgroundHelperMac>;
-  DISALLOW_COPY_AND_ASSIGN(BackgroundHelperMac);
+
+  BackgroundHelperMac(
+      const BackgroundHelperMac&) = delete;
+  BackgroundHelperMac& operator=(
+      const BackgroundHelperMac&) = delete;
 };
 
 }  // namespace brave_ads

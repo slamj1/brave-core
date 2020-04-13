@@ -33,7 +33,11 @@ class NotificationHelper {
 
  private:
   friend struct base::DefaultSingletonTraits<NotificationHelper>;
-  DISALLOW_COPY_AND_ASSIGN(NotificationHelper);
+
+  NotificationHelper(
+      const NotificationHelper&) = delete;
+  NotificationHelper& operator=(
+      const NotificationHelper&) = delete;
 };
 
 }  // namespace brave_ads

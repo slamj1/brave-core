@@ -122,7 +122,10 @@ class AdsService : public KeyedService {
       const base::Callback<void(bool)>& callback) = 0;
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(AdsService);
+  AdsService(
+      const AdsService&) = delete;
+  AdsService& operator=(
+      const AdsService&) = delete;
 };
 
 }  // namespace brave_ads

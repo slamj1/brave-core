@@ -154,7 +154,10 @@ class BatAdsImpl :
   std::unique_ptr<BatAdsClientMojoBridge> bat_ads_client_mojo_proxy_;
   std::unique_ptr<ads::Ads> ads_;
 
-  DISALLOW_COPY_AND_ASSIGN(BatAdsImpl);
+  BatAdsImpl(
+      const BatAdsImpl&) = delete;
+  BatAdsImpl& operator=(
+      const BatAdsImpl&) = delete;
 };
 
 }  // namespace bat_ads

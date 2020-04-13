@@ -32,7 +32,11 @@ class BackgroundHelperWin : public BackgroundHelper {
   bool IsForeground() const override;
 
   friend struct base::DefaultSingletonTraits<BackgroundHelperWin>;
-  DISALLOW_COPY_AND_ASSIGN(BackgroundHelperWin);
+
+  BackgroundHelperWin(
+      const BackgroundHelperWin&) = delete;
+  BackgroundHelperWin& operator=(
+      const BackgroundHelperWin&) = delete;
 };
 
 }  // namespace brave_ads

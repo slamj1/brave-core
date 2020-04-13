@@ -494,7 +494,10 @@ class AdsServiceImpl : public AdsService,
   mojo::AssociatedRemote<bat_ads::mojom::BatAds> bat_ads_;
   mojo::Remote<bat_ads::mojom::BatAdsService> bat_ads_service_;
 
-  DISALLOW_COPY_AND_ASSIGN(AdsServiceImpl);
+  AdsServiceImpl(
+      const AdsServiceImpl&) = delete;
+  AdsServiceImpl& operator=(
+      const AdsServiceImpl&) = delete;
 };
 
 }  // namespace brave_ads

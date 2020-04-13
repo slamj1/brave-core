@@ -80,7 +80,10 @@ class AdsNotificationHandler : public NotificationHandler {
    private:
     AdsNotificationHandler* const pointer_;
 
-    DISALLOW_COPY_AND_ASSIGN(UnownedPointer);
+    UnownedPointer(
+        const UnownedPointer&) = delete;
+    UnownedPointer& operator=(
+        const UnownedPointer&) = delete;
   };
 
  private:
@@ -106,7 +109,10 @@ class AdsNotificationHandler : public NotificationHandler {
   brave_ads::AdsServiceImpl* ads_service_;
   base::queue<base::OnceClosure> pending_notifications_;
 
-  DISALLOW_COPY_AND_ASSIGN(AdsNotificationHandler);
+  AdsNotificationHandler(
+      const AdsNotificationHandler&) = delete;
+  AdsNotificationHandler& operator=(
+      const AdsNotificationHandler&) = delete;
 };
 
 }  // namespace brave_ads

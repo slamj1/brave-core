@@ -119,7 +119,10 @@ class LogStreamImpl : public ads::LogStream {
  private:
   std::unique_ptr<logging::LogMessage> log_message_;
 
-  DISALLOW_COPY_AND_ASSIGN(LogStreamImpl);
+  LogStreamImpl(
+      const LogStreamImpl&) = delete;
+  LogStreamImpl& operator=(
+      const LogStreamImpl&) = delete;
 };
 
 namespace {

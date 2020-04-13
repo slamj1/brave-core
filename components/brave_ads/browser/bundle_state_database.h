@@ -108,7 +108,11 @@ class BundleStateDatabase {
   std::unique_ptr<base::MemoryPressureListener> memory_pressure_listener_;
 
   SEQUENCE_CHECKER(sequence_checker_);
-  DISALLOW_COPY_AND_ASSIGN(BundleStateDatabase);
+
+  BundleStateDatabase(
+      const BundleStateDatabase&) = delete;
+  BundleStateDatabase& operator=(
+      const BundleStateDatabase&) = delete;
 };
 
 }  // namespace brave_ads

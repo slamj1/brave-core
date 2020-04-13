@@ -35,7 +35,10 @@ class AdsServiceFactory : public BrowserContextKeyedServiceFactory {
       content::BrowserContext* context) const override;
   bool ServiceIsNULLWhileTesting() const override;
 
-  DISALLOW_COPY_AND_ASSIGN(AdsServiceFactory);
+  AdsServiceFactory(
+      const AdsServiceFactory&) = delete;
+  AdsServiceFactory& operator=(
+      const AdsServiceFactory&) = delete;
 };
 
 }  // namespace brave_ads

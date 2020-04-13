@@ -22,7 +22,10 @@ class LocaleHelperMock : public LocaleHelper {
   MOCK_CONST_METHOD0(GetLocale, std::string());
 
  private:
-  DISALLOW_COPY_AND_ASSIGN(LocaleHelperMock);
+  LocaleHelperMock(
+      const LocaleHelperMock&) = delete;
+  LocaleHelperMock& operator=(
+      const LocaleHelperMock&) = delete;
 };
 
 }  // namespace brave_ads

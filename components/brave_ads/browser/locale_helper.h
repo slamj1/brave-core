@@ -38,7 +38,11 @@ class LocaleHelper {
 
  private:
   friend struct base::DefaultSingletonTraits<LocaleHelper>;
-  DISALLOW_COPY_AND_ASSIGN(LocaleHelper);
+
+  LocaleHelper(
+      const LocaleHelper&) = delete;
+  LocaleHelper& operator=(
+      const LocaleHelper&) = delete;
 };
 
 }  // namespace brave_ads

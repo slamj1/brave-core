@@ -33,7 +33,11 @@ class BackgroundHelperLinux :
   bool IsForeground() const override;
 
   friend struct base::DefaultSingletonTraits<BackgroundHelperLinux>;
-  DISALLOW_COPY_AND_ASSIGN(BackgroundHelperLinux);
+
+  BackgroundHelperLinux(
+      const BackgroundHelperLinux&) = delete;
+  BackgroundHelperLinux& operator=(
+      const BackgroundHelperLinux&) = delete;
 };
 
 }  // namespace brave_ads

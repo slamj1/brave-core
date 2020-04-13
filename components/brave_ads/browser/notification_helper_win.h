@@ -49,7 +49,11 @@ class NotificationHelperWin
   bool CanShowBackgroundNotifications() const override;
 
   friend struct base::DefaultSingletonTraits<NotificationHelperWin>;
-  DISALLOW_COPY_AND_ASSIGN(NotificationHelperWin);
+
+  NotificationHelperWin(
+      const NotificationHelperWin&) = delete;
+  NotificationHelperWin& operator=(
+      const NotificationHelperWin&) = delete;
 };
 
 }  // namespace brave_ads

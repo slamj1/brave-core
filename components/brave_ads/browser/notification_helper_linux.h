@@ -30,7 +30,11 @@ class NotificationHelperLinux
   bool CanShowBackgroundNotifications() const override;
 
   friend struct base::DefaultSingletonTraits<NotificationHelperLinux>;
-  DISALLOW_COPY_AND_ASSIGN(NotificationHelperLinux);
+
+  NotificationHelperLinux(
+      const NotificationHelperLinux&) = delete;
+  NotificationHelperLinux& operator=(
+      const NotificationHelperLinux&) = delete;
 };
 
 }  // namespace brave_ads
