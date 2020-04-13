@@ -17,7 +17,8 @@ static BraveFarblingLevel GetBraveFarblingLevel(blink::LocalFrame* frame) {
   if (!frame || !frame->GetContentSettingsClient()) {
     return BraveFarblingLevel::BALANCED;
   }
-  return BraveFarblingLevel::BALANCED;
+
+  return frame->GetContentSettingsClient()->GetBraveFarblingLevel();
 }
 
 #endif  // BRAVE_RENDERER_BRAVE_CONTENT_SETTINGS_AGENT_IMPL_FARBLING_HELPER_H_

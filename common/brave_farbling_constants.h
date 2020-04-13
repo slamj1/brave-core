@@ -7,9 +7,9 @@
 #define BRAVE_COMMON_BRAVE_FARBLING_CONSTANTS_H_
 
 enum BraveFarblingLevel {
-  OFF = 0,
-  BALANCED = 1,
-  MAXIMUM = 2
+  BALANCED = 0,
+  OFF,
+  MAXIMUM
 };
 
 #endif  // BRAVE_COMMON_BRAVE_FARBLING_CONSTANTS_H_
